@@ -1,0 +1,169 @@
+[
+  {
+    "Name": "ProFit Treadmill X500",
+    "Description": "High-performance electric treadmill with 12 programs and heart rate monitor.",
+    "Price": 850,
+    "PictureUrl": "/images/products/treadmill-prof1.png",
+    "Type": "Treadmills",
+    "Brand": "ProFit",
+    "QuantityInStock": 12
+  },
+  {
+    "Name": "PowerWave Foldable Treadmill S20",
+    "Description": "Space-saving treadmill with LCD display and bluetooth connectivity.",
+    "Price": 670,
+    "PictureUrl": "/images/products/treadmill-pw1.png",
+    "Type": "Treadmills",
+    "Brand": "PowerWave",
+    "QuantityInStock": 8
+  },
+  {
+    "Name": "FitMax Enduro Treadmill 4000",
+    "Description": "Heavy-duty treadmill with incline control and shock absorption system.",
+    "Price": 950,
+    "PictureUrl": "/images/products/treadmill-fitmax1.png",
+    "Type": "Treadmills",
+    "Brand": "FitMax",
+    "QuantityInStock": 5
+  },
+
+  {
+    "Name": "IronCore Adjustable Dumbbells 40kg",
+    "Description": "Premium adjustable dumbbells with anti-slip grip and secure locking system.",
+    "Price": 320,
+    "PictureUrl": "/images/products/dumbbells-ironcore1.png",
+    "Type": "Dumbbells",
+    "Brand": "IronCore",
+    "QuantityInStock": 25
+  },
+  {
+    "Name": "ProFit Hex Dumbbells 2x10kg",
+    "Description": "Rubber-coated hex dumbbells, ideal for strength training.",
+    "Price": 85,
+    "PictureUrl": "/images/products/dumbbells-prof2.png",
+    "Type": "Dumbbells",
+    "Brand": "ProFit",
+    "QuantityInStock": 30
+  },
+  {
+    "Name": "FitMax Chrome Dumbbells Set 15kg",
+    "Description": "Shiny chrome finish dumbbells with ergonomic grip. Compact and stylish.",
+    "Price": 95,
+    "PictureUrl": "/images/products/dumbbells-fitmax2.png",
+    "Type": "Dumbbells",
+    "Brand": "FitMax",
+    "QuantityInStock": 22
+  },
+
+  {
+    "Name": "FitMax Kettlebell 16kg",
+    "Description": "Durable cast iron kettlebell with smooth handle for strength training.",
+    "Price": 70,
+    "PictureUrl": "/images/products/kettlebell-fitmax1.png",
+    "Type": "Kettlebells",
+    "Brand": "FitMax",
+    "QuantityInStock": 40
+  },
+  {
+    "Name": "PowerWave Vinyl Kettlebell 8kg",
+    "Description": "Color-coded vinyl kettlebell, suitable for beginners and light training.",
+    "Price": 40,
+    "PictureUrl": "/images/products/kettlebell-pw1.png",
+    "Type": "Kettlebells",
+    "Brand": "PowerWave",
+    "QuantityInStock": 60
+  },
+  {
+    "Name": "IronCore Pro Kettlebell 24kg",
+    "Description": "Professional-grade powder-coated kettlebell for serious lifters.",
+    "Price": 95,
+    "PictureUrl": "/images/products/kettlebell-iron1.png",
+    "Type": "Kettlebells",
+    "Brand": "IronCore",
+    "QuantityInStock": 15
+  },
+
+  {
+    "Name": "ZenFlex Yoga Mat Pro",
+    "Description": "Eco-friendly, non-slip yoga mat made from TPE material. Ideal for all practices.",
+    "Price": 45,
+    "PictureUrl": "/images/products/yogamat-zen1.png",
+    "Type": "Yoga Mats",
+    "Brand": "ZenFlex",
+    "QuantityInStock": 60
+  },
+  {
+    "Name": "ProFit Premium Yoga Mat",
+    "Description": "Extra-thick mat with dual-layer design for maximum comfort and grip.",
+    "Price": 55,
+    "PictureUrl": "/images/products/yogamat-prof1.png",
+    "Type": "Yoga Mats",
+    "Brand": "ProFit",
+    "QuantityInStock": 50
+  },
+  {
+    "Name": "PowerWave Travel Yoga Mat",
+    "Description": "Lightweight foldable mat perfect for yoga on the go.",
+    "Price": 38,
+    "PictureUrl": "/images/products/yogamat-pw1.png",
+    "Type": "Yoga Mats",
+    "Brand": "PowerWave",
+    "QuantityInStock": 70
+  },
+
+  {
+    "Name": "PowerWave Resistance Band Set",
+    "Description": "Full set of 5 resistance bands with varying intensity levels, includes carry bag.",
+    "Price": 30,
+    "PictureUrl": "/images/products/resistance-power1.png",
+    "Type": "Resistance Bands",
+    "Brand": "PowerWave",
+    "QuantityInStock": 100
+  },
+  {
+    "Name": "ZenFlex Loop Bands - Pack of 3",
+    "Description": "Soft fabric loop bands for glute and leg workouts. Anti-slip design.",
+    "Price": 25,
+    "PictureUrl": "/images/products/resistance-zen1.png",
+    "Type": "Resistance Bands",
+    "Brand": "ZenFlex",
+    "QuantityInStock": 80
+  },
+  {
+    "Name": "IronCore Resistance Tubes Set",
+    "Description": "Heavy-duty resistance tubes with handles, ankle straps, and door anchor.",
+    "Price": 40,
+    "PictureUrl": "/images/products/resistance-iron1.png",
+    "Type": "Resistance Bands",
+    "Brand": "IronCore",
+    "QuantityInStock": 65
+  },
+
+  {
+    "Name": "MuscleTech Weightlifting Gloves",
+    "Description": "Padded gloves with wrist support and ventilation mesh for heavy lifting.",
+    "Price": 18,
+    "PictureUrl": "/images/products/gloves-muscletech1.png",
+    "Type": "Accessories",
+    "Brand": "MuscleTech",
+    "QuantityInStock": 55
+  },
+  {
+    "Name": "ProFit Lifting Straps Set",
+    "Description": "Durable lifting straps for deadlifts and pull movements. One size fits all.",
+    "Price": 12,
+    "PictureUrl": "/images/products/straps-prof1.png",
+    "Type": "Accessories",
+    "Brand": "ProFit",
+    "QuantityInStock": 70
+  },
+  {
+    "Name": "FitMax Foam Roller",
+    "Description": "Textured foam roller for muscle recovery, mobility, and massage therapy.",
+    "Price": 28,
+    "PictureUrl": "/images/products/roller-fitmax1.png",
+    "Type": "Accessories",
+    "Brand": "FitMax",
+    "QuantityInStock": 45
+  }
+]

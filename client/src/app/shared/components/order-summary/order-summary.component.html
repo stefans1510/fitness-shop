@@ -9,7 +9,7 @@
                 </dl>
                 <dl class="flex items-center justify-between gap-4">
                     <dt class="font-medium text-gray-500">Discount</dt>
-                    <dd class="font-medium text-green-600">-{{cartService.totals()?.discount | currency}}</dd>
+                    <dd class="font-medium text-green-600">{{cartService.totals()?.discount | currency}}</dd>
                 </dl>
                 <dl class="flex items-center justify-between gap-4">
                     <dt class="font-medium text-gray-500">Delivery fee</dt>

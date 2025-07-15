@@ -6,10 +6,10 @@ import { SnackbarService } from '../services/snackbar.service';
 export const emptyCartGuard: CanActivateFn = (route, state) => {
   const cartService = inject(CartService);
   const router = inject(Router);
-  const snackBar = inject(SnackbarService);
+  const snackbar = inject(SnackbarService);
 
   if (!cartService.cart() || cartService.cart()?.items.length === 0) {
-    snackBar.error('Your cart is empty');
+    snackbar.error('Your cart is empty');
     router.navigateByUrl('/cart');
     return false;
   }

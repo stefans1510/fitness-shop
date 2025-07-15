@@ -1,0 +1,30 @@
+<section class="bg-white py-16">
+    <div class="mx-auto max-w-2xl px4">
+        <h2 class="font-semibold text-2xl mb-2">Thank you for your order!</h2>
+        <p class="text-gray-500 mb-8">Your order <span class="font-bold">#42</span>
+            will be processed at the shop. We will notify you once your order is shipped.
+        </p>
+        <div class="space-y-2 rounded-lg border border-e-gray-100 bg-gray-50 p-6 mb-8">
+            <dl class="flex items-center justify-between gap-4">
+                <dt class="font-normal text-gray-500">Date</dt>
+                <dd class="font-medium text-gray-900">some date</dd>
+            </dl>
+            <dl class="flex items-center justify-between gap-4">
+                <dt class="font-normal text-gray-500">Payment method</dt>
+                <dd class="font-medium text-gray-900">Visa</dd>
+            </dl>
+            <dl class="flex items-center justify-between gap-4">
+                <dt class="font-normal text-gray-500">Address</dt>
+                <dd class="font-medium text-gray-900">address here</dd>
+            </dl>
+            <dl class="flex items-center justify-between gap-4">
+                <dt class="font-normal text-gray-500">Amount</dt>
+                <dd class="font-medium text-gray-900">some amount</dd>
+            </dl>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button routerLink="/orders/42" mat-stroked-button>View Your Order</button>
+            <button routerLink="/shop" mat-flat-button>Continue Shopping</button>
+        </div>
+    </div>
+</section>

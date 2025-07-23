@@ -7,6 +7,8 @@ namespace Core.Interfaces
     Expression<Func<T, bool>>? Criteria { get; }
     Expression<Func<T, object>>? OrderBy { get; }
     Expression<Func<T, object>>? OrderByDesc { get; }
+    List<Expression<Func<T, object>>> Includes { get; }
+    List<string> IncludeStrings { get; } //for ThenInclude method
     bool IsDistinct { get; }
     int Take { get; }              //pagination
     int Skip { get; }

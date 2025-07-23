@@ -1,11 +1,14 @@
 using Core.Entities;
 using Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
 {
     public class SpecificationEvaluator<T> where T : BaseEntity
     {
-        public static IQueryable<T> GetQuery(IQueryable<T> query, ISpecification<T> specification)
+        public static IQueryable<T> GetQuery(
+            IQueryable<T> query, ISpecification<T> specification
+        )
         {
             if (specification.Criteria != null)
             {
@@ -32,10 +35,19 @@ namespace Infrastructure.Data
                 query = query.Skip(specification.Skip).Take(specification.Take);
             }
 
+            query = specification.Includes.Aggregate(
+                query, (current, include) => current.Include(include)
+            );
+            query = specification.IncludeStrings.Aggregate(
+                query, (current, include) => current.Include(include)
+            );
+
             return query;
         }
 
-        public static IQueryable<TResult> GetQuery<TSpec, TResult>(IQueryable<T> query, ISpecification<T, TResult> specification)
+        public static IQueryable<TResult> GetQuery<TSpec, TResult>(
+            IQueryable<T> query, ISpecification<T, TResult> specification
+        )
         {
             if (specification.Criteria != null)
             {

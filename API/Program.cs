@@ -41,11 +41,17 @@ app.UseCors(x => x
     .AllowAnyMethod()
     .AllowCredentials()
     .WithOrigins("http://localhost:4200", "https://localhost:4200"));
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<AppUser>(); //eg. api/login
 app.MapHub<NotificationHub>("/hub/notifications");
+app.MapFallbackToController("Index", "Fallback"); //fallback to serve index.html for SPA routing
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 try
 {

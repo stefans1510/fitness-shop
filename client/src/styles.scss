@@ -1,28 +1,48 @@
 @use '@angular/material' as mat;
+@use 'theme-colors.scss' as theme;
 
+@import url('https://fonts.googleapis.com/css2?family=Monserrat:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-$customTheme: mat.define-theme();
+html, body {
+    font-family: 'Monserrat', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
 
-@include mat.core();
+}
+
+$customTheme: mat.define-theme((
+  color: (
+    theme-type: light,
+    primary: theme.$primary-palette,
+  ),
+  typography: (
+    plain-family: 'Monserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+    brand-family: 'Monserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+    bold-weight: 900,
+    medium-weight: 700,
+    regular-weight: 400,
+  ),
+  density: (
+        scale: -1
+  )
+));
+
+@include mat.core(); 
 
 .custom-theme {
     @include mat.all-component-themes($customTheme);
-
     //override the button styles
     .mdc-button, .mdc-raised-button, .mdc-stroked-button, .mdc-flat-button {
         @apply rounded-md
     }
 }
-
 .container {
     @apply mx-auto max-w-screen-2xl
 }
 
 .text-primary {
-    color: purple;
+    color: #001487;
 }
 
 button.match-input-height {

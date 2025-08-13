@@ -1,8 +1,8 @@
 @if (products) {
-<div class="flex flex-col gap-3">
-    <div class="flex justify-between">
+<div class="flex flex-col gap-3 md:gap-6 w-full max-w-7xl mx-auto px-2 sm:px-4 items-stretch md:items-center">
+    <div class="flex flex-col md:flex-row md:justify-between gap-4 w-full">
         <mat-paginator
-            class="bg-white"
+            class="bg-white w-full md:w-auto max-w-xs mx-auto"
             (page)="handlePageEvent($event)"
             [length]="products.count"
             [pageSize]="shopParams.pageSize"
@@ -16,42 +16,42 @@
         <form
             #searchForm="ngForm"
             (ngSubmit)="onSearchChange()"
-            class="relative flex items-center w-full max-w-md mx-4"
+            class="relative flex items-center w-full max-w-md mx-auto md:mx-4 shadow-md rounded-md bg-white h-10"
         >
             <input
                 type="search"
-                class="block w-full p-4 text-sm text-gray-900 border-gray-700 rounded-lg"
+                class="block w-full px-2 pr-12 py-0 text-base text-gray-900 border-gray-700 rounded-lg h-10"
                 placeholder="Search"
                 name="search"
                 [(ngModel)]="shopParams.search"
             />
             <button mat-icon-button
                 type="submit"
-                class="absolute inset-y-0 right-8 top-2 flex items-center pl-3"
+                class="absolute inset-y-0 right-2 flex items-center pl-1 pr-1 h-10"
             >
-                <mat-icon>search</mat-icon>
+                <mat-icon fontSize="small">search</mat-icon>
             </button>
         </form>
 
-        <div class="flex gap-3">
-            <button class="match-input-height" mat-stroked-button (click)="openFiltersDialog()">
+        <div class="flex gap-3 w-full md:w-auto justify-center md:justify-end">
+            <button class="match-input-height w-full md:w-auto border-gray-300" mat-stroked-button (click)="openFiltersDialog()">
                 <mat-icon>filter_list</mat-icon>
                 Filters
             </button>
-            <button class="match-input-height" mat-stroked-button [mat-menu-trigger-for]="sortMenu">
+            <button class="match-input-height w-full md:w-auto border-gray-300" mat-stroked-button [mat-menu-trigger-for]="sortMenu">
                 <mat-icon>swap_vert</mat-icon>
                 Sort
             </button>
         </div>
     </div>
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full items-stretch">
         @for (product of products.data; track product.id) {
-        <app-product-item [product]="product"></app-product-item>
+        <app-product-item [product]="product" class="h-full min-h-[260px] flex flex-col" />
         }
     </div>
 </div>
 
-<mat-menu #sortMenu="matMenu">
+<mat-menu #sortMenu="matMenu" class="w-full max-w-xs mx-auto">
     <mat-selection-list [multiple]="false" (selectionChange)="onSortChange($event)">
         @for (sort of sortOptions; track $index) {
         <mat-list-option [value]="sort.value" [selected]="shopParams.sort === sort.value">
@@ -60,4 +60,14 @@
         }
     </mat-selection-list>
 </mat-menu>
+}
+
+@if (showBackToTop) {
+  <button
+    class="fixed bottom-6 right-6 z-50 bg-blue-800 text-white rounded-full shadow-lg p-3 transition hover:bg-blue-700 md:right-6 md:bottom-6 md:left-auto md:mx-0 md:w-auto w-2/3 left-1/2 transform -translate-x-1/2 md:translate-x-0 flex items-center justify-center"
+    (click)="scrollToTop()"
+    aria-label="Back to top"
+  >
+    <mat-icon>arrow_upward</mat-icon>
+  </button>
 }

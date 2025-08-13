@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { ShopService } from '../../core/services/shop.service';
 import { Product } from '../../shared/models/product';
 import { ProductItemComponent } from "./product-item/product-item.component";
@@ -12,6 +12,7 @@ import { MatListOption, MatSelectionList, MatSelectionListChange } from '@angula
 import { ShopParams } from '../../shared/models/shopParams';
 import { Pagination } from '../../shared/models/pagination';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-shop',
@@ -29,9 +30,10 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.scss'
 })
-export class ShopComponent {
+export class ShopComponent implements AfterViewInit, OnDestroy {
   private shopService = inject(ShopService);
-  private dialogService = inject(MatDialog)
+  private dialogService = inject(MatDialog);
+  private route = inject(ActivatedRoute);
   products?: Pagination<Product>;
   sortOptions = [
     {name: 'Alphabetical', value: 'name'},
@@ -39,10 +41,30 @@ export class ShopComponent {
     {name: 'Price: High-Low', value: 'priceDesc'}
   ]
   shopParams = new ShopParams();
-  pageSizeOptions = [5, 10, 15, 20];
+  pageSizeOptions = [6, 12, 18, 24];
+  showBackToTop: boolean = false;
+  private scrollHandler = () => this.checkScrollPosition();
+
+  constructor(private elRef: ElementRef) {}
 
   ngOnInit(): void {
-    this.initializeShop();
+    this.initializeShop(); // Initial load for brands/types/products
+    this.route.queryParamMap.subscribe(params => {
+      const typeParam = params.get('type');
+      this.shopParams.types = typeParam ? [typeParam] : [];
+      const brandParam = params.get('brand');
+      this.shopParams.brands = brandParam ? [brandParam] : [];
+      this.getProducts(); // Only update products on filter change
+    });
+  }
+
+  ngAfterViewInit(): void {
+    window.addEventListener('scroll', this.scrollHandler);
+    this.checkScrollPosition();
+  }
+
+  ngOnDestroy(): void {
+    window.removeEventListener('scroll', this.scrollHandler);
   }
 
   initializeShop() {
@@ -80,7 +102,6 @@ export class ShopComponent {
 
   openFiltersDialog() {
     const dialogReference = this.dialogService.open(FiltersDialogComponent, {
-      minWidth: '500px',
       data: {
         selectedTypes: this.shopParams.types,
         selectedBrands: this.shopParams.brands
@@ -96,5 +117,18 @@ export class ShopComponent {
         }
       }
     })
+  }
+
+  checkScrollPosition() {
+    const shopElement = this.elRef.nativeElement.querySelector('.flex.flex-col');
+    if (!shopElement) return;
+    const rect = shopElement.getBoundingClientRect();
+    const windowHeight = window.innerHeight;
+    // Show only if bottom of shop is visible on any screen size
+    this.showBackToTop = rect.bottom <= windowHeight + 10;
+  }
+
+  scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

@@ -32,4 +32,13 @@ export class FiltersDialogComponent {
       selectedBrands: this.selectedBrands
     })
   }
+
+  clearFilters() {
+    this.selectedTypes = [];
+    this.selectedBrands = [];
+    this.dialogReference.close({
+      selectedTypes: [],
+      selectedBrands: []
+    });
+  }
 }

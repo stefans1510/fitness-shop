@@ -1,31 +1,31 @@
 @if (product) {
-<section class="py-8">
-    <div class="max-w-screen-2xl px-4 mx-auto">
-        <div class="grid grid-cols-2 gap-8">
-            <div class="max-w-xl mx-auto">
-                <img class="w-full" src="{{product.pictureUrl}}" alt="product image">
+<section class="py-6 sm:py-8">
+    <div class="max-w-screen-lg sm:max-w-screen-xl md:max-w-screen-2xl px-2 sm:px-4 md:px-8 mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
+            <div class="max-w-full md:max-w-xl mx-auto">
+                <img class="w-full h-auto object-contain" src="{{product.pictureUrl}}" alt="product image">
             </div>
-            <div>
-                <h1 class="text-2xl font-semibold text-gray-900">{{product.name}}</h1>
-                <p>You have {{quantityInCart}} of this item in your cart.</p>
-                <div class="mt-4 items-center gap-4 flex">
-                    <p class="text-3xl font-extrabold text-gray-900">
+            <div class="px-2 sm:px-0">
+                <h1 class="text-lg sm:text-2xl font-semibold text-gray-900">{{product.name}}</h1>
+                <p class="text-sm sm:text-base">You have {{quantityInCart}} of this item in your cart.</p>
+                <div class="mt-2 sm:mt-4 items-center gap-2 sm:gap-4 flex">
+                    <p class="text-xl sm:text-3xl font-extrabold text-gray-900">
                         {{product.price | currency}}
                     </p>
                 </div>
-                <div class="flex gap-4 mt-6">
-                    <button [disabled]="quantity === quantityInCart" mat-flat-button class="match-input-height"
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-4 sm:mt-6">
+                    <button [disabled]="quantity === quantityInCart" mat-flat-button class="match-input-height w-full sm:w-auto"
                         (click)="updateCart()">
                         <mat-icon>shopping_cart</mat-icon>
                         {{getButtonText()}}
                     </button>
-                    <mat-form-field appearance="outline" class="flex">
+                    <mat-form-field appearance="outline" class="flex w-full sm:w-auto">
                         <mat-label>Quantity</mat-label>
                         <input matInput min="0" [(ngModel)]="quantity" type="number">
                     </mat-form-field>
                 </div>
                 <mat-divider></mat-divider>
-                <p class="mt-5 text-gray-600">
+                <p class="mt-4 sm:mt-5 text-gray-600 text-sm sm:text-base">
                     {{product.description}}
                 </p>
             </div>

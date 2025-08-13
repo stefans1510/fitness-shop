@@ -1,13 +1,14 @@
-<mat-card class="max-w-lg mx-auto m-32 p-8 bg-white">
+<mat-card class="max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto my-10 sm:my-20 md:my-32 p-4 sm:p-8 bg-gray-50">
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div class="text-center mb-6">
-            <h1 class="text-3xl font-semibold text-primary">Login</h1>
+        <div class="text-center mb-4 sm:mb-6">
+            <img src="/images/logo.png" alt="logo" class="h-10 sm:h-14 md:h-16 w-auto mx-auto mb-2">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-semibold text-primary">Login</h1>
         </div>
-        <mat-form-field appearance="outline" class="w-full mb-4">
+        <mat-form-field appearance="outline" class="w-full mb-3 sm:mb-4">
             <mat-label>Email Address</mat-label>
             <input type="email" placeholder="name@example.com" formControlName="email" matInput />
         </mat-form-field>
-        <mat-form-field appearance="outline" class="w-full mb-4">
+        <mat-form-field appearance="outline" class="w-full mb-3 sm:mb-4">
             <mat-label>Password</mat-label>
             <input type="password" placeholder="Password" formControlName="password" matInput />
         </mat-form-field>

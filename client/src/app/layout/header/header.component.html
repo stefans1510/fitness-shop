@@ -1,35 +1,86 @@
-<header class="border-b shadow-md p-3 w-full max-h-20 fixed top-0 z-50 bg-white">
-    <div class="flex align-middle items-center justify-between max-w-screen-2xl mx-auto">
-        <img routerLink="/" src="/images/logo.png" alt="logo" class="max-h-16">
-        <nav class="flex gap-3 my-2 uppercase text-2xl">
+<header class="border-b shadow-md w-full max-h-20 fixed top-0 z-50 bg-gray-50">
+    <div class="flex items-center justify-between max-w-screen-2xl mx-auto px-4 h-20">
+        <a routerLink="/" class="flex items-center">
+            <img src="/images/logo.png" alt="logo" class="h-16 sm:h-16 md:h-20 lg:h-24 w-auto max-w-[160px] sm:max-w-[200px] md:max-w-[240px] lg:max-w-[280px] cursor-pointer" />
+        </a>
+
+        <nav class="hidden md:flex gap-6 uppercase text-lg xl:text-2xl">
             <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
             <a routerLink="/shop" routerLinkActive="active">Shop</a>
-            <a routerLink="/.." routerLinkActive="active">Contact</a>
-            <a routerLink="/test-error" routerLinkActive="active">Contact</a>
-
+            <a [routerLink]="['/contact']" [class.active]="contactInView || false">Contact</a>
+            <a routerLink="/test-error" routerLinkActive="active" class="hidden">Errors</a>
         </nav>
-        <div class="flex gap-3 align-middle">
-            <a routerLink="/cart" 
-                matBadge="{{cartService.itemCount()}}" 
-                matBadgeSize="large" 
+
+        <button
+            mat-icon-button
+            class="md:hidden flex items-center p-2"
+            (click)="toggleMenu()"
+            aria-label="Open main menu"
+            type="button"
+        >
+            @if (!menuOpen) {
+                <mat-icon>menu</mat-icon>
+            } @else {
+                <mat-icon>menu_open</mat-icon>
+            }
+        </button>
+
+        <div class="flex gap-3 items-center">
+            <a routerLink="/cart" matBadge="{{cartService.itemCount()}}" matBadgeSize="medium"
                 class="custom-badge mt-2 mr-2">
                 <mat-icon>shopping_cart</mat-icon>
             </a>
             @if (accountService.currentUser()) {
-                <button mat-button [matMenuTriggerFor]="menu">
-                    <mat-icon>arrow_drop_down</mat-icon>
-                    <span>{{accountService.currentUser()?.email}}</span>
-                </button>
+            <button mat-button [matMenuTriggerFor]="menu" class="hidden md:flex items-center">
+                <mat-icon>arrow_drop_down</mat-icon>
+                <span>{{accountService.currentUser()?.email}}</span>
+            </button>
             } @else {
-                <button routerLink="/account/login" mat-stroked-button>Login</button>
-                <button routerLink="/account/register" mat-stroked-button>Register</button>
+            <button routerLink="/account/login" mat-stroked-button class="hidden md:inline border-gray-300">Login</button>
+            <button routerLink="/account/register" mat-stroked-button class="hidden md:inline border-gray-300">Register</button>
             }
         </div>
     </div>
+
+    @if (menuOpen) {
+    <nav class="md:hidden bg-gray-50 shadow px-4 py-2 flex flex-col gap-2 absolute top-20 left-0 right-0 z-40 max-w-s w-full mx-auto">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+      <a routerLink="/shop" routerLinkActive="active">Shop</a>
+      <a [routerLink]="['/contact']" [class.active]="contactInView || false">Contact</a>
+      @if (!accountService.currentUser()) {
+        <button routerLink="/account/login" mat-stroked-button class="w-full border-gray-300">Login</button>
+        <button routerLink="/account/register" mat-stroked-button class="w-full border-gray-300">Register</button>
+      } @else {
+        <button mat-button class="flex md:hidden items-center w-full justify-between" (click)="toggleDropdown()">
+          <span class="flex items-center">
+            <mat-icon>arrow_drop_down</mat-icon>
+            <span>{{accountService.currentUser()?.email}}</span>
+          </span>
+        </button>
+        @if (dropdownOpen) {
+          <div class="flex flex-col gap-1 px-3 py-2 bg-gray-50 rounded shadow max-w-s w-full mx-auto text-sm">
+            <button mat-menu-item class="px-3 w-full text-left" routerLink="/cart">
+              <mat-icon>shopping_cart</mat-icon>
+              My Cart
+            </button>
+            <button mat-menu-item class="px-3 w-full text-left" routerLink="/orders">
+              <mat-icon>history</mat-icon>
+              My Orders
+            </button>
+            <mat-divider></mat-divider>
+            <button mat-menu-item class="px-3 w-full text-left" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              Logout
+            </button>
+          </div>
+        }
+      }
+    </nav>
+  }
 </header>
 
 @if (busyService.loading) {
-    <mat-progress-bar mode="indeterminate" class="fixed top-20 z-50"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate" class="fixed top-20 z-50"></mat-progress-bar>
 }
 
 <mat-menu #menu="matMenu" class="px-3">

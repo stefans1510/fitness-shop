@@ -3,7 +3,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCard } from '@angular/material/card';
 import { AccountService } from '../../../core/services/account.service';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { TextInputComponent } from "../../../shared/components/text-input/text-input.component";
 
@@ -13,7 +13,8 @@ import { TextInputComponent } from "../../../shared/components/text-input/text-i
     ReactiveFormsModule,
     MatCard,
     MatButton,
-    TextInputComponent
+    TextInputComponent,
+    RouterLink
 ],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss'

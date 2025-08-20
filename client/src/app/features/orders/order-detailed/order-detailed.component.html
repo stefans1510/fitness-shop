@@ -3,7 +3,7 @@
   <div class="w-full px-2 sm:px-4">
     <div class="flex flex-col sm:flex-row justify-between items-center align-middle gap-2 sm:gap-0">
       <h2 class="text-xl sm:text-2xl text-center font-semibold">Summary for Order #{{order.id}}</h2>
-      <button routerLink="/orders" mat-stroked-button class="w-full sm:w-auto">Return to Orders</button>
+      <button (click)="onReturnClick()" mat-stroked-button class="w-full sm:w-auto">{{buttonText}}</button>
     </div>
     <div class="mt-6 sm:mt-8 py-2 sm:py-3 border-t border-gray-200 flex flex-col sm:flex-row gap-6 sm:gap-16">
       <div class="space-y-2">

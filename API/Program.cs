@@ -4,8 +4,11 @@ using Core.Entities;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+
+DotNetEnv.Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +31,10 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
 });
 builder.Services.AddSingleton<IShoppingCartService, ShopppingCartService>();
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<ShopContext>();
+builder.Services.AddIdentityApiEndpoints<AppUser>()
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ShopContext>();
+
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddSignalR();
 
@@ -58,8 +64,9 @@ try
     using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<ShopContext>();
+    var userManager = services.GetRequiredService<UserManager<AppUser>>();
     await context.Database.MigrateAsync(); //async apply migrations to db or create new if not exists
-    await ShopContextSeed.SeedAsync(context); //seed the data
+    await ShopContextSeed.SeedAsync(context, userManager); //seed the data
 }
 catch (Exception ex)
 {

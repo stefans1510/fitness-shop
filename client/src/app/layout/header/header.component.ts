@@ -11,6 +11,7 @@ import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
 import { MatDivider } from '@angular/material/divider';
 import { Subscription } from 'rxjs';
 import { ViewStateService } from '../../core/services/view-state.service';
+import { IsAdminDirective } from "../../shared/directives/is-admin.directive";
 
 
 @Component({
@@ -26,8 +27,9 @@ import { ViewStateService } from '../../core/services/view-state.service';
     MatMenu,
     MatDivider,
     MatMenuItem,
-    MatIconButton
-  ],
+    MatIconButton,
+    IsAdminDirective
+],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss'
 })

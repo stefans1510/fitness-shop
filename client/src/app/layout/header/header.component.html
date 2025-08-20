@@ -9,6 +9,7 @@
             <a routerLink="/shop" routerLinkActive="active">Shop</a>
             <a [routerLink]="['/contact']" [class.active]="contactInView || false">Contact</a>
             <a routerLink="/test-error" routerLinkActive="active" class="hidden">Errors</a>
+            <a *appIsAdmin routerLink="/admin" routerLinkActive="active">Admin</a>
         </nav>
 
         <button

@@ -26,6 +26,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       if (err.status === 401) {
         snackbar.error(err.error.title || err.error);
       }
+      if (err.status === 403) {
+        snackbar.error('Forbidden - You do not have permission to access this resource.');
+      }
       if (err.status === 404) {
         router.navigateByUrl('/not-found');
       }

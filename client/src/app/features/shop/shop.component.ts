@@ -36,6 +36,7 @@ export class ShopComponent implements AfterViewInit, OnDestroy {
   private shopService = inject(ShopService);
   private dialogService = inject(MatDialog);
   private route = inject(ActivatedRoute);
+  private scrollHandler = () => this.checkScrollPosition();
   products?: Pagination<Product>;
   sortOptions = [
     {name: 'Alphabetical', value: 'name'},
@@ -45,7 +46,6 @@ export class ShopComponent implements AfterViewInit, OnDestroy {
   shopParams = new ShopParams();
   pageSizeOptions = [6, 12, 18, 24];
   showBackToTop: boolean = false;
-  private scrollHandler = () => this.checkScrollPosition();
 
   constructor(private elRef: ElementRef) {}
 

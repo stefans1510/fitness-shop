@@ -3,8 +3,9 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Cart, CartItem } from '../../shared/models/cart';
 import { Product } from '../../shared/models/product';
-import { map } from 'rxjs';
+import { map, firstValueFrom } from 'rxjs';
 import { DeliveryMethod } from '../../shared/models/deliveryMethod';
+import { ShopService } from './shop.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,6 +13,7 @@ import { DeliveryMethod } from '../../shared/models/deliveryMethod';
 export class CartService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
+  private shopService = inject(ShopService);
   cart = signal<Cart | null>(null);
   itemCount = computed(() => {
     return this.cart()?.items.reduce((sum, item) => sum + item.quantity, 0);
@@ -103,10 +105,13 @@ export class CartService {
   }
 
   private mapProductToCartItem(item: Product): CartItem {
+    // Use discounted price if available (for company users), otherwise use regular price
+    const effectivePrice = item.hasDiscount && item.discountedPrice ? item.discountedPrice : item.price;
+    
     return {
       productId: item.id,
       productName: item.name,
-      price: item.price,
+      price: effectivePrice,
       quantity: 0,
       pictureUrl: item.pictureUrl,
       type: item.type,
@@ -123,5 +128,61 @@ export class CartService {
     localStorage.setItem('cart_id', cart.id);
 
     return cart;
+  }
+
+  // Clear cart completely (for logout)
+  clearCart() {
+    localStorage.removeItem('cart_id');
+    this.cart.set(null);
+    this.selectedDelivery.set(null);
+  }
+
+  // Update cart item prices based on current user type (company vs regular user)
+  async updateCartPricesForUserType() {
+    const cart = this.cart();
+    if (!cart || cart.items.length === 0) return;
+
+    let hasUpdates = false;
+    const updatedItems: CartItem[] = [];
+
+    // Fetch current product information with updated prices for current user
+    for (const cartItem of cart.items) {
+      try {
+        const product = await firstValueFrom(this.shopService.getProduct(cartItem.productId));
+        if (product) {
+          const effectivePrice = product.hasDiscount && product.discountedPrice 
+            ? product.discountedPrice 
+            : product.price;
+          
+          // Check if price changed
+          if (Math.abs(cartItem.price - effectivePrice) > 0.01) {
+            hasUpdates = true;
+          }
+
+          updatedItems.push({
+            ...cartItem,
+            price: effectivePrice
+          });
+        } else {
+          // Keep original item if product not found
+          updatedItems.push(cartItem);
+        }
+      } catch (error) {
+        console.error('Error fetching product for cart update:', error);
+        // Keep original item on error
+        updatedItems.push(cartItem);
+      }
+    }
+
+    // Update cart if prices changed
+    if (hasUpdates) {
+      const updatedCart = { ...cart, items: updatedItems };
+      this.setCart(updatedCart);
+    }
+  }
+
+  // Force refresh cart prices (useful for manual refresh)
+  async refreshCartPrices() {
+    await this.updateCartPricesForUserType();
   }
 }

@@ -9,7 +9,6 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatMenuModule } from '@angular/material/menu';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 import { ConfirmationDialogService } from '../../../core/services/confirmation-dialog.service';
@@ -31,12 +30,10 @@ import { Pagination } from '../../../shared/models/pagination';
     MatSelectModule,
     MatOptionModule,
     MatTooltipModule,
-    MatMenuModule,
     FormsModule
   ],
   templateUrl: './admin-users.component.html',
-  styleUrl: './admin-users.component.scss',
-  encapsulation: ViewEncapsulation.None
+  styleUrl: './admin-users.component.scss'
 })
 export class AdminUsersComponent implements OnInit {
   private adminService = inject(AdminService);
@@ -45,16 +42,13 @@ export class AdminUsersComponent implements OnInit {
   
   users: User[] = [];
   pagination?: Pagination<User>;
-  displayedColumns: string[] = ['email', 'firstName', 'lastName', 'roles', 'actions'];
+  displayedColumns: string[] = ['email', 'firstName', 'lastName', 'userType', 'actions'];
   
   // Parameters for API
   userParameters = new UserParameters();
   
   // Role filtering options
-  roleFilterOptions = ['All', 'Admin', 'Customer'];
-  
-  // Available roles for changing user roles
-  availableRoles = ['Admin', 'Customer'];
+  roleFilterOptions = ['All', 'Admin', 'Customer', 'Company'];
   
   // Loading states
   loading = false;
@@ -79,6 +73,32 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
+  getRoleClass(role: string): string {
+    switch (role) {
+      case 'Admin':
+        return 'role-badge role-admin';
+      case 'Company':
+        return 'role-badge role-company';
+      case 'Customer':
+        return 'role-badge role-customer';
+      default:
+        return 'role-badge role-default';
+    }
+  }
+
+  getRoleIcon(role: string): string {
+    switch (role) {
+      case 'Admin':
+        return 'admin_panel_settings';
+      case 'Company':
+        return 'business';
+      case 'Customer':
+        return 'person';
+      default:
+        return 'help';
+    }
+  }
+
   onSearch() {
     this.userParameters.pageIndex = 1;
     this.loadUsers();
@@ -87,20 +107,6 @@ export class AdminUsersComponent implements OnInit {
   onRoleFilterChange() {
     this.userParameters.pageIndex = 1;
     this.loadUsers();
-  }
-
-  onUserRoleChange(user: User, newRole: string) {
-    this.adminService.changeUserRole(user.id!, newRole).subscribe({
-      next: (response) => {
-        this.snackbar.success(response.message || 'User role updated successfully');
-        this.loadUsers(); // Reload to get updated role data
-      },
-      error: (error) => {
-        console.error('Error changing user role:', error);
-        this.snackbar.error('Error changing user role. Please try again.');
-        this.loadUsers(); // Reload to revert any optimistic updates
-      }
-    });
   }
 
   onPageChange(event: any) {

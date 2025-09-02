@@ -20,6 +20,12 @@ namespace Infrastructure.Config
                     Id = "customer-id",
                     Name = "Customer",
                     NormalizedName = "CUSTOMER"
+                },
+                new IdentityRole
+                {
+                    Id = "company-id",
+                    Name = "Company",
+                    NormalizedName = "COMPANY"
                 }
             );
         }

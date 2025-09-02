@@ -18,6 +18,10 @@ export class AccountService {
     return Array.isArray(roles) ? roles.includes('Admin') : false; 
   });
 
+  isCompanyUser = computed(() => {
+    return this.currentUser()?.isCompanyUser === true;
+  });
+
   login(values: any) {
     let params = new HttpParams();
     params = params.append('useCookies', true);
@@ -66,5 +70,9 @@ export class AccountService {
 
   getAuthState() {
     return this.http.get<{isAuthenticated: boolean}>(this.baseUrl + 'account/auth-status');
+  }
+
+  checkCompanyCodeAvailability(companyCode: string) {
+    return this.http.get<{available: boolean}>(this.baseUrl + 'account/check-company-code/' + companyCode);
   }
 }

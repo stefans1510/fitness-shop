@@ -7,4 +7,16 @@
     @if (control.hasError('email')) {
         <mat-error>Email is invalid.</mat-error>
     }
+    @if (control.hasError('minlength')) {
+        <mat-error>{{label}} must be at least {{control.errors?.['minlength']?.requiredLength}} characters.</mat-error>
+    }
+    @if (control.hasError('maxlength')) {
+        <mat-error>{{label}} cannot exceed {{control.errors?.['maxlength']?.requiredLength}} characters.</mat-error>
+    }
+    @if (control.hasError('pattern')) {
+        <mat-error>{{label}} can only contain letters and numbers.</mat-error>
+    }
+    @if (control.hasError('companyCodeTaken')) {
+        <mat-error>This company code is already registered.</mat-error>
+    }
 </mat-form-field>

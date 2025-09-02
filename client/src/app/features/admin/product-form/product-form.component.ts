@@ -199,7 +199,8 @@ export class ProductFormComponent implements OnInit {
       pictureUrl: formData.pictureUrl || '',
       brand: formData.brand || '',
       type: formData.type || '',
-      quantityInStock: formData.quantityInStock || 0
+      quantityInStock: formData.quantityInStock || 0,
+      hasDiscount: false
     };
 
     if (this.productId) {

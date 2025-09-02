@@ -20,7 +20,13 @@ export class InitService {
       cart: cart$,
       user: this.accountService.getUserInfo().pipe(
         tap(user => {
-          if (user) this.signalrService.createHubConnection();
+          if (user) {
+            this.signalrService.createHubConnection();
+            // Update cart prices based on user type after login
+            setTimeout(() => {
+              this.cartService.updateCartPricesForUserType();
+            }, 100); // Small delay to ensure cart is loaded first
+          }
         })
       )
     });

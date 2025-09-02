@@ -9,9 +9,23 @@
                 <h1 class="text-lg sm:text-2xl font-semibold text-gray-900">{{product.name}}</h1>
                 <p class="text-sm sm:text-base">You have {{quantityInCart}} of this item in your cart.</p>
                 <div class="mt-2 sm:mt-4 items-center gap-2 sm:gap-4 flex">
-                    <p class="text-xl sm:text-3xl font-extrabold text-gray-900">
-                        {{product.price | currency}}
-                    </p>
+                    @if (product.hasDiscount && product.discountedPrice) {
+                        <div class="flex flex-col">
+                            <p class="text-lg sm:text-xl line-through text-gray-500">
+                                {{product.price | currency}}
+                            </p>
+                            <p class="text-xl sm:text-3xl font-extrabold text-red-600">
+                                {{product.discountedPrice | currency}}
+                            </p>
+                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded w-fit mt-1">
+                                15% OFF - Company Discount
+                            </span>
+                        </div>
+                    } @else {
+                        <p class="text-xl sm:text-3xl font-extrabold text-gray-900">
+                            {{product.price | currency}}
+                        </p>
+                    }
                 </div>
                 <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-4 sm:mt-6">
                     <button [disabled]="quantity === quantityInCart" mat-flat-button class="match-input-height w-full sm:w-auto"

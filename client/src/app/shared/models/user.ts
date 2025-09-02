@@ -5,6 +5,8 @@ export type User = {
     email: string;
     address?: Address;
     roles?: string[];
+    companyCode?: string;
+    isCompanyUser?: boolean;
 }
 
 export type Address = {

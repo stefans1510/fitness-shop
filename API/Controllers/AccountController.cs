@@ -4,6 +4,7 @@ using Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
@@ -15,9 +16,11 @@ namespace API.Controllers
             var user = new AppUser
             {
                 FirstName = registerDto.FirstName,
-                LastName = registerDto.LastName,
+                LastName = registerDto.IsCompanyRegistration ? string.Empty : registerDto.LastName,
                 Email = registerDto.Email,
-                UserName = registerDto.Email
+                UserName = registerDto.Email,
+                CompanyCode = registerDto.IsCompanyRegistration ? registerDto.CompanyCode : null,
+                IsCompanyUser = registerDto.IsCompanyRegistration
             };
 
             var result = await signInManager.UserManager.CreateAsync(user, registerDto.Password);
@@ -32,7 +35,20 @@ namespace API.Controllers
                 return ValidationProblem();
             }
 
+            // Assign role based on registration type
+            var roleName = registerDto.IsCompanyRegistration ? "Company" : "Customer";
+            await signInManager.UserManager.AddToRoleAsync(user, roleName);
+
             return Ok();
+        }
+
+        [HttpGet("check-company-code/{companyCode}")]
+        public async Task<ActionResult<bool>> CheckCompanyCodeAvailability(string companyCode)
+        {
+            var exists = await signInManager.UserManager.Users
+                .AnyAsync(u => u.CompanyCode == companyCode);
+            
+            return Ok(new { available = !exists });
         }
 
         [Authorize]
@@ -57,6 +73,8 @@ namespace API.Controllers
                 user.FirstName,
                 user.LastName,
                 user.Email,
+                user.CompanyCode,
+                user.IsCompanyUser,
                 Address = user.Address?.ToDto(),
                 Roles = roles
             });

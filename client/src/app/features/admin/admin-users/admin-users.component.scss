@@ -1,23 +1,28 @@
-/* Clean component styles - no deep CSS overrides */
-
-/* Force hide any visible Angular attribute text */
-:host {
-  * {
-    &::before,
-    &::after {
-      content: none !important;
-      display: none !important;
-    }
-  }
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 9999px;
 }
 
-/* Global override to hide any attribute content */
-::ng-deep {
-  [class*="_ngcontent-"]::before,
-  [class*="_ngcontent-"]::after,
-  [_ngcontent-]::before,
-  [_ngcontent-]::after {
-    content: none !important;
-    display: none !important;
-  }
+.role-admin {
+  background-color: #fef2f2;
+  color: #991b1b;
+}
+
+.role-company {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.role-customer {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.role-default {
+  background-color: #f3f4f6;
+  color: #374151;
 }

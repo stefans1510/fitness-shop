@@ -58,6 +58,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.accountService.logout().subscribe({
       next: () => {
         this.accountService.currentUser.set(null);
+        this.cartService.clearCart(); // Clear cart on logout
         this.router.navigateByUrl('/');
       }
     })

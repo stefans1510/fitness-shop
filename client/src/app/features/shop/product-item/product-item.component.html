@@ -3,7 +3,14 @@
         <img src="{{product.pictureUrl}}">
         <mat-card-content class="mt-2 flex-1 flex flex-col justify-between">
             <h2 class="text-sm font-semibold uppercase overflow-hidden text-ellipsis whitespace-nowrap">{{product.name}}</h2>
-            <p class="font-light">{{product.price | currency}}</p>
+            @if (product.hasDiscount && product.discountedPrice) {
+                <div class="font-light">
+                    <span class="line-through text-gray-500 text-sm">{{product.price | currency}}</span>
+                    <span class="text-red-600 font-semibold ml-2">{{product.discountedPrice | currency}}</span>
+                </div>
+            } @else {
+                <p class="font-light">{{product.price | currency}}</p>
+            }
         </mat-card-content>
         <mat-card-actions (click)="$event.stopPropagation()">
             <button mat-stroked-button class="w-full border-gray-400" (click)="cartService.addItemToCart(product)">

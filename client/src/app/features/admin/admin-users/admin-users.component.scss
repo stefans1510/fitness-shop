@@ -1,0 +1,23 @@
+/* Clean component styles - no deep CSS overrides */
+
+/* Force hide any visible Angular attribute text */
+:host {
+  * {
+    &::before,
+    &::after {
+      content: none !important;
+      display: none !important;
+    }
+  }
+}
+
+/* Global override to hide any attribute content */
+::ng-deep {
+  [class*="_ngcontent-"]::before,
+  [class*="_ngcontent-"]::after,
+  [_ngcontent-]::before,
+  [_ngcontent-]::after {
+    content: none !important;
+    display: none !important;
+  }
+}

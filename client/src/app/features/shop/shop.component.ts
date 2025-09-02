@@ -70,8 +70,9 @@ export class ShopComponent implements AfterViewInit, OnDestroy {
   }
 
   initializeShop() {
-    this.shopService.getBrands();
-    this.shopService.getTypes();
+    // Subscribe to brands and types to ensure they're loaded into cache
+    this.shopService.getBrands().subscribe();
+    this.shopService.getTypes().subscribe();
     this.getProducts();
   }
 

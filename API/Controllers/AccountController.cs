@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using API.DTOs;
 using API.Extensions;
 using Core.Entities;
@@ -51,14 +50,15 @@ namespace API.Controllers
             if (User.Identity?.IsAuthenticated == false) return NoContent();
 
             var user = await signInManager.UserManager.GetUserByEmailWithAddress(User);
+            var roles = await signInManager.UserManager.GetRolesAsync(user);
 
             return Ok(new
             {
                 user.FirstName,
                 user.LastName,
                 user.Email,
-                Address = user.Address.ToDto(),
-                Roles = User.FindFirstValue(ClaimTypes.Role)
+                Address = user.Address?.ToDto(),
+                Roles = roles
             });
         }
 

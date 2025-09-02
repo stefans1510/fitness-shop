@@ -1,10 +1,17 @@
 <div class="min-h-screen">
-    <mat-tab-group class="bg-white">
+    <mat-tab-group 
+        class="bg-white" 
+        [selectedIndex]="selectedTabIndex" 
+        (selectedTabChange)="onTabChange($event.index)"
+    >
         <mat-tab label="Orders">
             <app-admin-orders></app-admin-orders>
         </mat-tab>
         <mat-tab label="Products">
             <app-admin-products></app-admin-products>
+        </mat-tab>
+        <mat-tab label="Categories">
+            <app-admin-categories></app-admin-categories>
         </mat-tab>
         <mat-tab label="Users">
             <app-admin-users></app-admin-users>

@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatTab, MatTabGroup } from '@angular/material/tabs';
 import { AdminUsersComponent } from "./admin-users/admin-users.component";
 import { AdminOrdersComponent } from "./admin-orders/admin-orders.component";
 import { AdminProductsComponent } from "./admin-products/admin-products.component";
+import { AdminCategoriesComponent } from "./admin-categories/admin-categories.component";
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin',
@@ -11,49 +13,54 @@ import { AdminProductsComponent } from "./admin-products/admin-products.componen
     MatTab,
     AdminUsersComponent,
     AdminOrdersComponent,
-    AdminProductsComponent
+    AdminProductsComponent,
+    AdminCategoriesComponent
 ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'
 })
-export class AdminComponent {
-  // private adminService = inject(AdminService);
-  // displayedColumns: string[] = ['id', 'buyerEmail', 'orderDate', 'status', 'action'];
-  // dataSource = new MatTableDataSource<Order>([]);
-  // orderParameters = new OrderParameters;
-  // totalItems = 0;
-  // statusOptions = ['All', 'PaymentReceived', 'PaymentMissmatch', 'Refunded', 'Pending'];
+export class AdminComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  selectedTabIndex = 0;
 
-  // @ViewChild(MatPaginator) paginator!: MatPaginator;
+  ngOnInit() {
+    // Check for tab parameter in query params
+    this.route.queryParams.subscribe(params => {
+      const tab = params['tab'];
+      if (tab) {
+        this.selectedTabIndex = this.getTabIndexFromName(tab);
+      }
+    });
+  }
 
-  // ngOnInit(): void {
-  //   this.loadOrders();
-  // }
+  onTabChange(index: number) {
+    const tabName = this.getTabNameFromIndex(index);
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab: tabName },
+      queryParamsHandling: 'merge'
+    });
+  }
 
-  // ngAfterViewInit() {
-  //   this.dataSource.paginator = this.paginator;
-  // }
+  private getTabIndexFromName(tabName: string): number {
+    switch (tabName.toLowerCase()) {
+      case 'orders': return 0;
+      case 'products': return 1;
+      case 'categories': return 2;
+      case 'users': return 3;
+      default: return 0;
+    }
+  }
 
-  // loadOrders() {
-  //   this.adminService.getOrders(this.orderParameters).subscribe({
-  //     next: response => {
-  //       if (response.data) {
-  //         this.dataSource.data = response.data;
-  //         this.totalItems = response.count;
-  //       }
-  //     }
-  //   });
-  // }
+  private getTabNameFromIndex(index: number): string {
+    switch (index) {
+      case 0: return 'orders';
+      case 1: return 'products';
+      case 2: return 'categories';
+      case 3: return 'users';
+      default: return 'orders';
+    }
+  }
 
-  // onPageChange(event: any) {
-  //   this.orderParameters.pageNumber = event.pageIndex + 1;
-  //   this.orderParameters.pageSize = event.pageSize;
-  //   this.loadOrders();
-  // }
-
-  // onFilterChange(event: any) {
-  //   this.orderParameters.filter = event.value;
-  //   this.orderParameters.pageNumber = 1; // Reset to first page on filter change
-  //   this.loadOrders();
-  // }
 }

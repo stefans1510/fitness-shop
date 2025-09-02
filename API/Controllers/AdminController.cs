@@ -1,17 +1,21 @@
 using API.DTOs;
 using API.Extensions;
+using Core.Entities;
 using Core.Entities.OrderAggregate;
 using Core.Interfaces;
 using Core.Specifications;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class AdminController(
         IUnitOfWork unitOfWork,
-        IPaymentService paymentService
+        IPaymentService paymentService,
+        UserManager<AppUser> userManager
     ) : BaseApiController
     {
 
@@ -66,6 +70,251 @@ namespace API.Controllers
             }
 
             return BadRequest("Problem refunding order");
+        }
+
+        [HttpPost("products")]
+        public async Task<ActionResult<Product>> CreateProduct(Product product)
+        {
+            unitOfWork.Repository<Product>().Add(product);
+
+            if (await unitOfWork.Complete())
+            {
+                return CreatedAtAction("GetProduct", "Products", new { id = product.Id }, product);
+            }
+
+            return BadRequest("Problem creating product");
+        }
+
+        [HttpPost("products/upload-picture")]
+        public async Task<ActionResult> UploadProductPicture([FromForm] IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded");
+
+            // Use the client's public/images/products folder
+            var clientPublicPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "client", "public", "images", "products");
+            var uploadsFolder = Path.GetFullPath(clientPublicPath);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            // Check if file already exists
+            var filePath = Path.Combine(uploadsFolder, file.FileName);
+            if (System.IO.File.Exists(filePath))
+            {
+                return BadRequest(new { 
+                    message = $"A file with the name '{file.FileName}' already exists. Please rename your file or choose a different image.",
+                    fileName = file.FileName 
+                });
+            }
+
+            // Save the file
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var relativePath = Path.Combine("images", "products", file.FileName).Replace("\\", "/");
+
+            return Ok(new { pictureUrl = relativePath });
+        }
+
+        [HttpPut("products/{id:int}")]
+        public async Task<ActionResult> UpdateProduct(int id, Product product)
+        {
+            if (product.Id != id || !ProductExists(id))
+                return BadRequest("Cannot update this produt");
+
+            unitOfWork.Repository<Product>().Update(product);
+
+            if (await unitOfWork.Complete())
+            {
+                return NoContent();
+            }
+
+            return BadRequest("Problem updating product");
+        }
+
+        private bool ProductExists(int id)
+        {
+            return unitOfWork.Repository<Product>().Exists(id);
+        }
+
+        [HttpDelete("products/{id:int}")]
+        public async Task<ActionResult> DeleteProduct(int id)
+        {
+            var product = await unitOfWork.Repository<Product>().GetByIdAsync(id);
+
+            if (product == null) return NotFound();
+
+            unitOfWork.Repository<Product>().Remove(product);
+
+            if (await unitOfWork.Complete())
+            {
+                return NoContent();
+            }
+
+            return BadRequest("Problem deleting product");
+        }
+
+        [HttpDelete("products/brands/{brandName}")]
+        public async Task<ActionResult> DeleteBrand(string brandName)
+        {
+            try
+            {
+                // Get all products directly without pagination to check for brand usage
+                var allProducts = await unitOfWork.Repository<Product>().ListAllAsync();
+                var productsWithBrand = allProducts.Where(p => string.Equals(p.Brand, brandName, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                if (productsWithBrand.Any())
+                {
+                    return BadRequest(new
+                    {
+                        message = $"Cannot delete brand '{brandName}' as it is being used by {productsWithBrand.Count} product(s)",
+                        products = productsWithBrand.Select(p => new { p.Id, p.Name }).ToArray()
+                    });
+                }
+
+                // If no products use this brand, it's effectively "deleted" (won't appear in brand list)
+                return Ok(new { message = $"Brand '{brandName}' is not used by any products and has been removed from the list." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error checking brand usage: {ex.Message}");
+            }
+        }
+        
+        [HttpDelete("products/types/{typeName}")]
+        public async Task<ActionResult> DeleteType(string typeName)
+        {
+            try
+            {
+                // Get all products directly without pagination to check for type usage
+                var allProducts = await unitOfWork.Repository<Product>().ListAllAsync();
+                var productsWithType = allProducts.Where(p => string.Equals(p.Type, typeName, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                if (productsWithType.Any())
+                {
+                    return BadRequest(new { 
+                        message = $"Cannot delete type '{typeName}' as it is being used by {productsWithType.Count} product(s)",
+                        products = productsWithType.Select(p => new { p.Id, p.Name }).ToArray()
+                    });
+                }
+
+                // If no products use this type, it's effectively "deleted" (won't appear in type list)
+                return Ok(new { message = $"Type '{typeName}' is not used by any products and has been removed from the list." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Error checking type usage: {ex.Message}");
+            }
+        }
+
+        // User Management Methods
+        [HttpGet("users")]
+        public async Task<ActionResult> GetUsers(
+            [FromQuery] UserSpecificationParameters userSpecParams
+        )
+        {
+            // Get users from Identity (since AppUser doesn't inherit from BaseEntity)
+            var users = userManager.Users.AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(userSpecParams.Search))
+            {
+                users = users.Where(u => 
+                    (u.Email != null && u.Email.ToLower().Contains(userSpecParams.Search.ToLower())) ||
+                    (u.FirstName != null && u.FirstName.ToLower().Contains(userSpecParams.Search.ToLower())) ||
+                    (u.LastName != null && u.LastName.ToLower().Contains(userSpecParams.Search.ToLower()))
+                );
+            }
+
+            // Get all users that match search criteria first
+            var allUsers = await users.ToListAsync();
+            
+            // Create DTOs with role information and apply role filtering
+            var userDtos = new List<UserDto>();
+            foreach (var user in allUsers)
+            {
+                var roles = await userManager.GetRolesAsync(user);
+                var userDto = user.ToDto(roles);
+                
+                // Apply role filter if specified
+                if (!string.IsNullOrEmpty(userSpecParams.Role) && userSpecParams.Role != "All")
+                {
+                    if (roles.Contains(userSpecParams.Role))
+                    {
+                        userDtos.Add(userDto);
+                    }
+                }
+                else
+                {
+                    userDtos.Add(userDto);
+                }
+            }
+
+            // Apply pagination to filtered results
+            var totalItems = userDtos.Count;
+            var paginatedUsers = userDtos
+                .Skip(userSpecParams.PageSize * (userSpecParams.PageIndex - 1))
+                .Take(userSpecParams.PageSize)
+                .ToList();
+
+            var pagination = new API.RequestHelpers.Pagination<UserDto>(
+                userSpecParams.PageIndex, 
+                userSpecParams.PageSize, 
+                totalItems, 
+                paginatedUsers
+            );
+
+            return Ok(pagination);
+        }
+
+        [HttpDelete("users/{userId}")]
+        public async Task<ActionResult> DeleteUser(string userId)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            
+            if (user == null)
+                return NotFound("User not found");
+
+            // Hard delete - safe because orders only store email as string
+            var result = await userManager.DeleteAsync(user);
+            
+            if (result.Succeeded)
+            {
+                return Ok(new { message = $"User {user.Email} has been permanently deleted. Order history remains intact." });
+            }
+            
+            return BadRequest("Problem deleting user");
+        }
+
+        [HttpPut("users/{userId}/role")]
+        public async Task<ActionResult> ChangeUserRole(string userId, [FromBody] string newRole)
+        {
+            var user = await userManager.FindByIdAsync(userId);
+            
+            if (user == null)
+                return NotFound("User not found");
+
+            // Remove all existing roles
+            var currentRoles = await userManager.GetRolesAsync(user);
+            if (currentRoles.Any())
+            {
+                await userManager.RemoveFromRolesAsync(user, currentRoles);
+            }
+
+            // Add new role
+            var result = await userManager.AddToRoleAsync(user, newRole);
+            
+            if (result.Succeeded)
+            {
+                return Ok(new { message = $"User {user.Email} role changed to {newRole}" });
+            }
+            
+            return BadRequest("Problem changing user role");
         }
     }
 }

@@ -4,6 +4,7 @@ import { Pagination } from '../../shared/models/pagination';
 import { Product } from '../../shared/models/product';
 import { ShopParams } from '../../shared/models/shopParams';
 import { environment } from '../../../environments/environment';
+import { Observable, of, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -37,24 +38,43 @@ export class ShopService {
     params = params.append('pageSize', shopParams.pageSize);
     params = params.append('pageIndex', shopParams.pageIndex);
 
-    return this.http.get<Pagination<Product>>(this.baseUrl + 'products', {params});
-   }
+    return this.http.get<Pagination<Product>>(this.baseUrl + 'products', { params });
+  }
 
-   getProduct(id: number) {
+  getProduct(id: number) {
     return this.http.get<Product>(this.baseUrl + 'products/' + id);
-   }
+  }
 
-   getTypes() {
-    if (this.types.length > 0) return;
-    return this.http.get<string[]>(this.baseUrl + 'products/types').subscribe({
-      next: response => this.types = response
-    })
-   }
+  getTypes(): Observable<string[]> {
+    if (this.types.length > 0) {
+      return of(this.types);
+    }
+    return this.http.get<string[]>(this.baseUrl + 'products/types').pipe(
+      tap(response => this.types = response)
+    );
+  }
 
-   getBrands() {
-    if (this.brands.length > 0) return;
-    return this.http.get<string[]>(this.baseUrl + 'products/brands').subscribe({
-      next: response => this.brands = response
-    })
-   }
+  getBrands(): Observable<string[]> {
+    if (this.brands.length > 0) {
+      return of(this.brands);
+    }
+    return this.http.get<string[]>(this.baseUrl + 'products/brands').pipe(
+      tap(response => this.brands = response)
+    );
+  }
+
+  // Methods to clear cache when new brands/types are added
+  clearBrandsCache() {
+    this.brands = [];
+  }
+
+  clearTypesCache() {
+    this.types = [];
+  }
+
+  clearProductCache() {
+    this.brands = [];
+    this.types = [];
+  }
+
 }

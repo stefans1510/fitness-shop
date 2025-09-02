@@ -1,5 +1,5 @@
 export class OrderParameters {
-    pageNumber = 1;
+    pageIndex = 1;
     pageSize = 10;
     filter = '';
 }

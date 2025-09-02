@@ -55,21 +55,21 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   onPageChange(event: PageEvent) {
-    this.orderParameters.pageNumber = event.pageIndex + 1;
+    this.orderParameters.pageIndex = event.pageIndex + 1;
     this.orderParameters.pageSize = event.pageSize;
     this.loadOrders();
   }
 
   onFilterChange(event: MatSelectChange) {
     this.orderParameters.filter = event.value;
-    this.orderParameters.pageNumber = 1; // Reset to first page on filter change
+    this.orderParameters.pageIndex = 1; // Reset to first page on filter change
     this.loadOrders();
   }
 
   async openConfirmDialog(orderId: number) {
     const confirmed = await this.confirmationDialogService.confirm(
       'Confirm Refund',
-      'Are you sure you want to refund this order? This action cannot be undone.'
+      `Are you sure you want to refund the order #${orderId} ? This action cannot be undone.`
     )
 
     if (confirmed) {

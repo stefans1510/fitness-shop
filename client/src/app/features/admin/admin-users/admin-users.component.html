@@ -1,1 +1,115 @@
-<p>admin-users works!</p>
+<div class="flex justify-between items-center mt-4 max-w-screen-2xl mx-auto">
+    <h2 class="text-2xl font-semibold">User Management</h2>
+    <div class="flex gap-4 items-center mr-4">
+        <mat-form-field appearance="outline" class="w-48">
+            <mat-label>Role Filter</mat-label>
+            <mat-select [(ngModel)]="userParameters.role" (selectionChange)="onRoleFilterChange()">
+                @for (role of roleFilterOptions; track role) {
+                    <mat-option [value]="role === 'All' ? '' : role">{{role}}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="w-full max-w-xs">
+            <mat-label>Search</mat-label>
+            <input matInput [(ngModel)]="userParameters.search" (ngModelChange)="onSearch()" placeholder="Search by email or name" />
+        </mat-form-field>
+    </div>
+</div>
+<div class="p-4">
+    @if (loading) {
+        <div class="flex justify-center items-center p-8">
+            <mat-icon class="animate-spin">refresh</mat-icon>
+            <span class="ml-2">Loading users...</span>
+        </div>
+    } @else {
+        <div class="mat-elevation-z8 border shadow-md">
+            <table mat-table [dataSource]="users" class="bg-white">
+                <ng-container matColumnDef="email">
+                    <th mat-header-cell *matHeaderCellDef>Email</th>
+                    <td mat-cell *matCellDef="let user">
+                        <div class="flex items-center">
+                            <div class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-medium mr-3">
+                                {{user.firstName?.[0]}}{{user.lastName?.[0]}}
+                            </div>
+                            <span class="font-medium">{{user.email}}</span>
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="firstName">
+                    <th mat-header-cell *matHeaderCellDef>First Name</th>
+                    <td mat-cell *matCellDef="let user">{{user.firstName}}</td>
+                </ng-container>
+                <ng-container matColumnDef="lastName">
+                    <th mat-header-cell *matHeaderCellDef>Last Name</th>
+                    <td mat-cell *matCellDef="let user">{{user.lastName}}</td>
+                </ng-container>
+                <ng-container matColumnDef="roles">
+                    <th mat-header-cell *matHeaderCellDef>Roles</th>
+                    <td mat-cell *matCellDef="let user" class="!py-3 relative !text-left">
+                        <div class="flex items-center gap-3 justify-start">
+                            <div class="flex gap-1 flex-wrap">
+                                @for (role of user.roles; track role) {
+                                    <span class="px-2 py-1 bg-primary text-white text-xs rounded-full">{{role}}</span>
+                                }
+                                @if (!user.roles || user.roles.length === 0) {
+                                    <span class="text-gray-500 text-sm">No roles</span>
+                                }
+                            </div>
+                            <div class="relative">
+                                <button 
+                                    mat-stroked-button 
+                                    [matMenuTriggerFor]="roleMenu"
+                                    class="h-10 px-3 text-sm min-w-24">
+                                    {{user.roles && user.roles.length > 0 ? user.roles[0] : 'No Role'}}
+                                    <mat-icon class="ml-1 text-sm">expand_more</mat-icon>
+                                </button>
+                                <mat-menu #roleMenu="matMenu">
+                                    @for (role of availableRoles; track role) {
+                                        <button mat-menu-item (click)="onUserRoleChange(user, role)">{{role}}</button>
+                                    }
+                                </mat-menu>
+                            </div>
+                        </div>
+                    </td>
+                </ng-container>
+                <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let user">
+                        <button 
+                            (click)="deleteUser(user)"
+                            matTooltip="Delete" 
+                            mat-icon-button>
+                            <mat-icon class="text-red-600">delete</mat-icon>
+                        </button>
+                    </td>
+                </ng-container>
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+            <mat-paginator
+                [pageSizeOptions]="[5, 10, 20]"
+                [length]="pagination?.count || 0"
+                [pageSize]="userParameters.pageSize"
+                [pageIndex]="userParameters.pageIndex - 1"
+                (page)="onPageChange($event)"
+                showFirstLastButtons 
+                class="bg-white">
+            </mat-paginator>
+        </div>
+
+        <!-- No Users Message -->
+        @if (users.length === 0 && !loading) {
+            <div class="text-center py-12">
+                <mat-icon class="text-gray-400 text-6xl mb-4">people_outline</mat-icon>
+                <h3 class="text-xl font-medium text-gray-900 mb-2">No users found</h3>
+                <p class="text-gray-500">
+                    @if (userParameters.search || userParameters.role) {
+                        Try adjusting your search criteria or filters
+                    } @else {
+                        No users have been registered yet
+                    }
+                </p>
+            </div>
+        }
+    }
+</div>

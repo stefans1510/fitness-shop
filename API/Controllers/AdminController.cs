@@ -91,9 +91,48 @@ namespace API.Controllers
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded");
 
-            // Use the client's public/images/products folder
-            var clientPublicPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "client", "public", "images", "products");
-            var uploadsFolder = Path.GetFullPath(clientPublicPath);
+            // Sanitize filename - replace spaces and special characters
+            var originalFileName = file.FileName;
+            var fileExtension = Path.GetExtension(originalFileName);
+            var fileNameWithoutExtension = Path.GetFileNameWithoutExtension(originalFileName);
+            
+            // Replace spaces with hyphens and remove other problematic characters
+            var sanitizedFileName = fileNameWithoutExtension
+                .Replace(" ", "-")
+                .Replace("(", "")
+                .Replace(")", "")
+                .Replace("[", "")
+                .Replace("]", "")
+                .Replace("{", "")
+                .Replace("}", "")
+                .Replace("&", "and")
+                .Replace("#", "")
+                .Replace("%", "")
+                .Replace("@", "")
+                .Replace("!", "")
+                .Replace("$", "")
+                .Replace("^", "")
+                .Replace("*", "")
+                .Replace("=", "")
+                .Replace("+", "")
+                .Replace("?", "")
+                .Replace("<", "")
+                .Replace(">", "")
+                .Replace("|", "")
+                .Replace("\\", "")
+                .Replace("/", "")
+                .Replace(":", "")
+                .Replace(";", "")
+                .Replace("\"", "")
+                .Replace("'", "")
+                .Replace(",", "")
+                .ToLower();
+
+            var sanitizedFullFileName = sanitizedFileName + fileExtension.ToLower();
+
+            // Use the client's src/assets/images/products folder (Angular watches this folder)
+            var clientAssetsPath = Path.Combine(Directory.GetCurrentDirectory(), "..", "client", "src", "assets", "images", "products");
+            var uploadsFolder = Path.GetFullPath(clientAssetsPath);
 
             if (!Directory.Exists(uploadsFolder))
             {
@@ -101,12 +140,12 @@ namespace API.Controllers
             }
 
             // Check if file already exists
-            var filePath = Path.Combine(uploadsFolder, file.FileName);
+            var filePath = Path.Combine(uploadsFolder, sanitizedFullFileName);
             if (System.IO.File.Exists(filePath))
             {
                 return BadRequest(new { 
-                    message = $"A file with the name '{file.FileName}' already exists. Please rename your file or choose a different image.",
-                    fileName = file.FileName 
+                    message = $"A file with the name '{sanitizedFullFileName}' already exists. Please rename your file or choose a different image.",
+                    fileName = sanitizedFullFileName 
                 });
             }
 
@@ -116,7 +155,7 @@ namespace API.Controllers
                 await file.CopyToAsync(stream);
             }
 
-            var relativePath = Path.Combine("images", "products", file.FileName).Replace("\\", "/");
+            var relativePath = "/assets/images/products/" + sanitizedFullFileName;
 
             return Ok(new { pictureUrl = relativePath });
         }
@@ -291,30 +330,37 @@ namespace API.Controllers
             return BadRequest("Problem deleting user");
         }
 
-        [HttpPut("users/{userId}/role")]
-        public async Task<ActionResult> ChangeUserRole(string userId, [FromBody] string newRole)
+        [HttpPost("users/create-admin")]
+        public async Task<ActionResult> CreateAdminUser([FromBody] RegisterDto registerDto)
         {
-            var user = await userManager.FindByIdAsync(userId);
-            
-            if (user == null)
-                return NotFound("User not found");
-
-            // Remove all existing roles
-            var currentRoles = await userManager.GetRolesAsync(user);
-            if (currentRoles.Any())
+            // Check if user with this email already exists
+            var existingUser = await userManager.FindByEmailAsync(registerDto.Email);
+            if (existingUser != null)
             {
-                await userManager.RemoveFromRolesAsync(user, currentRoles);
+                return BadRequest(new { message = "A user with this email already exists." });
             }
 
-            // Add new role
-            var result = await userManager.AddToRoleAsync(user, newRole);
-            
-            if (result.Succeeded)
+            var user = new AppUser
             {
-                return Ok(new { message = $"User {user.Email} role changed to {newRole}" });
+                FirstName = registerDto.FirstName,
+                LastName = registerDto.LastName,
+                Email = registerDto.Email,
+                UserName = registerDto.Email,
+                IsCompanyUser = false // Admin users are not company users
+            };
+
+            var result = await userManager.CreateAsync(user, registerDto.Password);
+
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(e => e.Description).ToArray();
+                return BadRequest(new { message = "Failed to create user", errors });
             }
-            
-            return BadRequest("Problem changing user role");
+
+            // Assign Admin role
+            await userManager.AddToRoleAsync(user, "Admin");
+
+            return Ok(new { message = $"Admin user '{user.Email}' created successfully" });
         }
     }
 }

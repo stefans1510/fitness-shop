@@ -24,55 +24,55 @@
     </div>
 </div>
 <div class="p-4">
-    <div class="mat-elevation-z8 border shadow-md">
-        <table mat-table [dataSource]="dataSource" class="bg-white">
+    <div class="mat-elevation-z2 border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <table mat-table [dataSource]="dataSource" class="bg-white w-full rounded-lg">
             <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef> ID </th>
-                <td mat-cell *matCellDef="let product"> {{product.id}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> ID </th>
+                <td mat-cell *matCellDef="let product" class="border-b border-gray-100 py-4 text-gray-800"> {{product.id}} </td>
             </ng-container>
             <ng-container matColumnDef="picture">
-                <th mat-header-cell *matHeaderCellDef> Picture </th>
-                <td mat-cell *matCellDef="let product"><img src="{{product.pictureUrl}}" alt="product image"
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Picture </th>
+                <td mat-cell *matCellDef="let product" class="border-b border-gray-100 py-4"><img src="{{product.pictureUrl}}" alt="product image"
                         style="width: 60px; height: 60px; object-fit: contain;"></td>
             </ng-container>
             <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> Name </th>
-                <td mat-cell *matCellDef="let product"> {{product.name}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Name </th>
+                <td mat-cell *matCellDef="let product" class="border-b border-gray-100 py-4 text-gray-800"> {{product.name}} </td>
             </ng-container>
             <ng-container matColumnDef="brand">
-                <th mat-header-cell *matHeaderCellDef> Brand </th>
-                <td mat-cell *matCellDef="let product"> {{product.brand}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Brand </th>
+                <td mat-cell *matCellDef="let product" class="border-b border-gray-100 py-4 text-gray-800"> {{product.brand}} </td>
             </ng-container>
             <ng-container matColumnDef="type">
-                <th mat-header-cell *matHeaderCellDef> Type </th>
-                <td mat-cell *matCellDef="let product"> {{product.type}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Type </th>
+                <td mat-cell *matCellDef="let product" class="border-b border-gray-100 py-4 text-gray-800"> {{product.type}} </td>
             </ng-container>
             <ng-container matColumnDef="price">
-                <th mat-header-cell *matHeaderCellDef> Price </th>
-                <td mat-cell *matCellDef="let product"> {{product.price | currency}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Price </th>
+                <td mat-cell *matCellDef="let product" class="border-b border-gray-100 py-4 text-gray-800"> {{product.price | currency}} </td>
             </ng-container>
             <ng-container matColumnDef="quantityInStock">
-                <th mat-header-cell *matHeaderCellDef> Quantity In Stock </th>
-                <td mat-cell *matCellDef="let product"> {{product.quantityInStock}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Quantity In Stock </th>
+                <td mat-cell *matCellDef="let product" class="border-b border-gray-100 py-4 text-gray-800"> {{product.quantityInStock}} </td>
             </ng-container>
             <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef> Actions </th>
-                <td mat-cell *matCellDef="let product">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Actions </th>
+                <td mat-cell *matCellDef="let product" class="border-b border-gray-100 py-4">
                     <div class="flex gap-3">
-                        <button routerLink="/admin/product-form/{{product.id}}" matTooltip="Edit" mat-icon-button>
+                        <button routerLink="/admin/product-form/{{product.id}}" matTooltip="Edit" mat-icon-button class="hover:bg-blue-50">
                             <mat-icon class="text-blue-800">edit</mat-icon>
                         </button>
-                        <button (click)="openConfirmDialog(product)" matTooltip="Delete" mat-icon-button>
+                        <button (click)="openConfirmDialog(product)" matTooltip="Delete" mat-icon-button class="hover:bg-red-50">
                             <mat-icon class="text-red-600">delete</mat-icon>
                         </button>
                     </div>
                 </td>
             </ng-container>
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-gray-50"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 transition-colors"></tr>
         </table>
         <mat-paginator [pageSizeOptions]="[6, 12, 18]" [length]="totalItems" [pageSize]="shopParameters.pageSize"
-            (page)="onPageChange($event)" showFirstLastButtons class="bg-white">
+            (page)="onPageChange($event)" showFirstLastButtons class="bg-gray-50 border-t border-gray-200">
         </mat-paginator>
     </div>
 </div>

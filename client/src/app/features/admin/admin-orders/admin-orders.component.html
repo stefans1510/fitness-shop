@@ -10,36 +10,37 @@
     </mat-form-field>
 </div>
 <div class="p-4">
-    <div class="mat-elevation-z8 border shadow-md">
-        <table mat-table [dataSource]="dataSource" class="bg-white">
+    <div class="mat-elevation-z2 border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <table mat-table [dataSource]="dataSource" class="bg-white w-full rounded-lg">
             <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef> ID </th>
-                <td mat-cell *matCellDef="let order"> {{order.id}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> ID </th>
+                <td mat-cell *matCellDef="let order" class="border-b border-gray-100 py-4 text-gray-800"> {{order.id}} </td>
             </ng-container>
             <ng-container matColumnDef="buyerEmail">
-                <th mat-header-cell *matHeaderCellDef> Customer </th>
-                <td mat-cell *matCellDef="let order"> {{order.buyerEmail}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Customer </th>
+                <td mat-cell *matCellDef="let order" class="border-b border-gray-100 py-4 text-gray-800"> {{order.buyerEmail}} </td>
             </ng-container>
             <ng-container matColumnDef="orderDate">
-                <th mat-header-cell *matHeaderCellDef> Date </th>
-                <td mat-cell *matCellDef="let order"> {{order.orderDate | date: 'short'}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Date </th>
+                <td mat-cell *matCellDef="let order" class="border-b border-gray-100 py-4 text-gray-800"> {{order.orderDate | date: 'short'}} </td>
             </ng-container>
             <ng-container matColumnDef="total">
-                <th mat-header-cell *matHeaderCellDef> Total </th>
-                <td mat-cell *matCellDef="let order"> {{order.total | currency}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Total </th>
+                <td mat-cell *matCellDef="let order" class="border-b border-gray-100 py-4 text-gray-800"> {{order.total | currency}} </td>
             </ng-container>
             <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef> Status </th>
-                <td mat-cell *matCellDef="let order"> {{order.status}} </td>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Status </th>
+                <td mat-cell *matCellDef="let order" class="border-b border-gray-100 py-4 text-gray-800"> {{order.status}} </td>
             </ng-container>
             <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef> Actions </th>
-                <td mat-cell *matCellDef="let order">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Actions </th>
+                <td mat-cell *matCellDef="let order" class="border-b border-gray-100 py-4">
                     <div class="flex gap-3">
                         <button 
                             routerLink="/orders/{{order.id}}"
                             matTooltip="View" 
                             mat-icon-button 
+                            class="hover:bg-blue-50"
                         >
                             <mat-icon class="text-blue-800">visibility</mat-icon>
                         </button>
@@ -48,14 +49,15 @@
                             (click)="openConfirmDialog(order.id)" 
                             matTooltip="Refund" 
                             mat-icon-button
+                            class="hover:bg-red-50"
                         >
                             <mat-icon class="text-red-600">undo</mat-icon>
                         </button>
                     </div>
                 </td>
             </ng-container>
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-gray-50"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 transition-colors"></tr>
         </table>
         <mat-paginator
             [pageSizeOptions]="[5, 10, 20]"
@@ -63,7 +65,7 @@
             [pageSize]="orderParameters.pageSize"
             (page)="onPageChange($event)"
             showFirstLastButtons 
-            class="bg-white">
+            class="bg-gray-50 border-t border-gray-200">
         </mat-paginator>
     </div>
 </div>

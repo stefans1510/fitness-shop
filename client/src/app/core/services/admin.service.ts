@@ -18,7 +18,6 @@ export class AdminService {
   private http = inject(HttpClient);
   private shopService = inject(ShopService);
 
-  // Order Management
   getOrders(orderParameters: OrderParameters) {
     let parameters = new HttpParams();
 
@@ -40,7 +39,6 @@ export class AdminService {
     return this.http.post<Order>(this.baseUrl + 'admin/orders/refund/' + id, {});
   }
 
-  // Product Management
   createProduct(product: Product) {
     return this.http.post<Product>(this.baseUrl + 'admin/products', product).pipe(
       tap(() => this.shopService.clearProductCache()) // Clear cache so new brands/types are loaded
@@ -65,7 +63,6 @@ export class AdminService {
     );
   }
 
-  // Category Management (delete only - brands and types are created via products)
   deleteBrand(brand: string) {
     return this.http.delete(this.baseUrl + 'admin/products/brands/' + encodeURIComponent(brand)).pipe(
       tap(() => this.shopService.clearBrandsCache())
@@ -100,9 +97,7 @@ export class AdminService {
     return this.http.delete<{message: string}>(this.baseUrl + 'admin/users/' + id);
   }
 
-  changeUserRole(userId: string, newRole: string) {
-    return this.http.put<{message: string}>(this.baseUrl + 'admin/users/' + userId + '/role', `"${newRole}"`, {
-      headers: { 'Content-Type': 'application/json' }
-    });
+  createAdminUser(adminUser: any) {
+    return this.http.post<{message: string}>(this.baseUrl + 'admin/users/create-admin', adminUser);
   }
 }

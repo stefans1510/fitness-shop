@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    partial class ShopContextModelSnapshot : ModelSnapshot
+    [Migration("20250903140943_UpdateImagePathsToAssets")]
+    partial class UpdateImagePathsToAssets
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -267,43 +270,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("Products");
                 });
 
-            modelBuilder.Entity("Core.Entities.StockReservation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("ExpiresAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsCommitted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ReservationId")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime>("ReservedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ReservedQuantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReservationId");
-
-                    b.HasIndex("ProductId", "IsCommitted");
-
-                    b.ToTable("StockReservations");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -334,21 +300,21 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = "admin-id",
-                            ConcurrencyStamp = "34c0550a-6775-41e7-8d96-8424e406a814",
+                            ConcurrencyStamp = "781578f5-35e3-494f-be15-cd2c258159f7",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "customer-id",
-                            ConcurrencyStamp = "19bad67a-980e-476b-9122-33e1e73f6b56",
+                            ConcurrencyStamp = "72530681-d366-4d4c-b0a5-6690056a5f67",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
                             Id = "company-id",
-                            ConcurrencyStamp = "3139a901-e97e-4f60-b6a5-df2de6efe0a6",
+                            ConcurrencyStamp = "965e263a-7cf4-4fa6-a8a5-03cd6ad02dd6",
                             Name = "Company",
                             NormalizedName = "COMPANY"
                         });
@@ -585,17 +551,6 @@ namespace Infrastructure.Migrations
 
                     b.Navigation("ItemOrdered")
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Entities.StockReservation", b =>
-                {
-                    b.HasOne("Core.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

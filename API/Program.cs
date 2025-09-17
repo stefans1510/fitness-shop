@@ -29,7 +29,8 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(config =>
     var configuration = ConfigurationOptions.Parse(connString, true);
     return ConnectionMultiplexer.Connect(configuration);
 });
-builder.Services.AddSingleton<IShoppingCartService, ShopppingCartService>();
+builder.Services.AddSingleton<IShoppingCartService, ShoppingCartService>();
+builder.Services.AddScoped<IInventoryService, InventoryService>();
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<AppUser>()
     .AddRoles<IdentityRole>()

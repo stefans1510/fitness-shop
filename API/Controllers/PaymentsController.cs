@@ -16,7 +16,8 @@ namespace API.Controllers
         IUnitOfWork unitOfWork,
         ILogger<PaymentsController> logger,
         IConfiguration configuration,
-        IHubContext<NotificationHub> hubContext
+        IHubContext<NotificationHub> hubContext,
+        IInventoryService inventoryService
     ) : BaseApiController
     {
         private readonly string _webhookSecret = configuration["StripeSettings:WhSecret"]!;
@@ -47,12 +48,22 @@ namespace API.Controllers
             {
                 var stripeEvent = ConstructStripeEvent(json);
 
-                if (stripeEvent.Data.Object is not PaymentIntent intent)
+                if (stripeEvent.Type == "payment_intent.succeeded")  // handle the payment_intent.succeeded event
                 {
-                    return BadRequest("Invalid event data");
+                    if (stripeEvent.Data.Object is PaymentIntent intent)
+                    {
+                        await HandlePaymentIntentSucceeded(intent);
+                    }
+                    else
+                    {
+                        logger.LogWarning("Received payment_intent.succeeded event but could not cast to PaymentIntent");
+                        return BadRequest("Invalid PaymentIntent data");
+                    }
                 }
-
-                await HandlePaymentIntentSucceeded(intent);
+                else
+                {   
+                    logger.LogInformation("Received Stripe event of type {EventType}, ignoring", stripeEvent.Type);  // log other event types but don't process them
+                }
 
                 return Ok();   //informing Stripe of event reception and handling by API
             }
@@ -80,10 +91,20 @@ namespace API.Controllers
                 if ((long)order.GetTotal() * 100 != intent.Amount)
                 {
                     order.Status = OrderStatus.PaymentMissmatch;
+                    // Release reserved stock for payment mismatch
+                    await inventoryService.ReleaseReservedStock(intent.Id);
                 }
                 else
                 {
                     order.Status = OrderStatus.PaymentReceived;
+                    // Commit reserved stock - this will reduce actual inventory
+                    var stockCommitted = await inventoryService.CommitReservedStock(intent.Id);
+                    if (!stockCommitted)
+                    {
+                        logger.LogError("Failed to commit stock for order {OrderId}, payment intent {PaymentIntentId}", 
+                            order.Id, intent.Id);
+                        // Consider how to handle this - maybe set order status to a special state
+                    }
                 }
 
                 await unitOfWork.Complete();

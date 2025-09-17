@@ -12,7 +12,8 @@ namespace API.Controllers
     [Authorize]
     public class OrdersController(
         IShoppingCartService shoppingCartService,
-        IUnitOfWork unitOfWork
+        IUnitOfWork unitOfWork,
+        IInventoryService inventoryService
         ) : BaseApiController
     {
         [HttpPost]
@@ -25,6 +26,13 @@ namespace API.Controllers
 
             if (shoppingCart.PaymentIntentId == null) return BadRequest("No payment intent for this order");
 
+            // Reserve stock using Payment Intent ID as reservation ID
+            var stockReserved = await inventoryService.ReserveStock(shoppingCart.Items, shoppingCart.PaymentIntentId);
+            if (!stockReserved)
+            {
+                return BadRequest("Insufficient stock for one or more items in your cart");
+            }
+
             var items = new List<OrderItem>();
 
             foreach (var item in shoppingCart.Items)
@@ -32,7 +40,12 @@ namespace API.Controllers
                 var productItem = await unitOfWork.Repository<Product>()
                     .GetByIdAsync(item.ProductId);
 
-                if (productItem == null) return BadRequest("Problem with the order");
+                if (productItem == null) 
+                {
+                    // Release reserved stock if product validation fails
+                    await inventoryService.ReleaseReservedStock(shoppingCart.PaymentIntentId);
+                    return BadRequest("Problem with the order");
+                }
 
                 var itemOrdered = new ProductItemOrdered
                 {

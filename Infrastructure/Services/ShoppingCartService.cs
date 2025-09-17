@@ -5,7 +5,7 @@ using StackExchange.Redis;
 
 namespace Infrastructure.Services
 {
-    public class ShopppingCartService(IConnectionMultiplexer redis) : IShoppingCartService
+    public class ShoppingCartService(IConnectionMultiplexer redis) : IShoppingCartService
     {
         private readonly IDatabase _database = redis.GetDatabase();
         public async Task<bool> DeleteShoppingCartAsync(string key)

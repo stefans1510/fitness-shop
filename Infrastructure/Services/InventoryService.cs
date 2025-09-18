@@ -165,6 +165,11 @@ namespace Infrastructure.Services
             }
         }
 
+        public async Task<Product?> GetProduct(int productId)
+        {
+            return await _context.Products.FindAsync(productId);
+        }
+
         private async Task CleanupExpiredReservations()
         {
             var expiredReservations = await _context.StockReservations

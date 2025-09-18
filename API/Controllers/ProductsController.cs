@@ -12,7 +12,7 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductsController(IUnitOfWork unitOfWork, UserManager<AppUser> userManager) : BaseApiController
+    public class ProductsController(IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IInventoryService inventoryService) : BaseApiController
     {
         private async Task<bool> IsCompanyUserAsync()
         {
@@ -69,6 +69,31 @@ namespace API.Controllers
             var specification = new TypeListSpecification();
 
             return Ok(await unitOfWork.Repository<Product>().ListAsync(specification));
+        }
+
+        [HttpGet("{productId:int}/stock")]
+        public async Task<ActionResult<object>> GetAvailableStock(int productId)
+        {
+            var availableStock = await inventoryService.GetAvailableStock(productId);
+            
+            // Get total stock from product
+            var product = await inventoryService.GetProduct(productId);
+            var totalStock = product?.QuantityInStock ?? 0;
+            
+            return Ok(new
+            {
+                productId,
+                totalStock,
+                availableStock,
+                isOutOfStock = availableStock <= 0
+            });
+        }
+
+        [HttpGet("{productId:int}/check-availability/{requestedQuantity:int}")]
+        public async Task<ActionResult<bool>> CheckStockAvailability(int productId, int requestedQuantity)
+        {
+            var isAvailable = await inventoryService.CheckStockAvailability(productId, requestedQuantity);
+            return Ok(isAvailable);
         }
     }
 }

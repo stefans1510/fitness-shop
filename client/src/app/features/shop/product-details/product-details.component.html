@@ -8,6 +8,20 @@
             <div class="px-2 sm:px-0">
                 <h1 class="text-lg sm:text-2xl font-semibold text-gray-900">{{product.name}}</h1>
                 <p class="text-sm sm:text-base">You have {{quantityInCart}} of this item in your cart.</p>
+                
+                <!-- Stock information -->
+                @if (stockInfo()) {
+                    <div class="text-sm mt-2">
+                        @if (isOutOfStock) {
+                            <p class="text-red-600 font-medium">Out of Stock</p>
+                        } @else if (maxAvailableQuantity <= 5) {
+                            <p class="text-orange-600">Only {{maxAvailableQuantity}} left in stock</p>
+                        } @else {
+                            <p class="text-green-600">{{maxAvailableQuantity}} in stock</p>
+                        }
+                    </div>
+                }
+                
                 <div class="mt-2 sm:mt-4 items-center gap-2 sm:gap-4 flex">
                     @if (product.hasDiscount && product.discountedPrice) {
                         <div class="flex flex-col">
@@ -28,14 +42,29 @@
                     }
                 </div>
                 <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-4 sm:mt-6">
-                    <button [disabled]="quantity === quantityInCart" mat-flat-button class="match-input-height w-full sm:w-auto"
-                        (click)="updateCart()">
-                        <mat-icon>shopping_cart</mat-icon>
-                        {{getButtonText()}}
-                    </button>
+                    @if (isOutOfStock) {
+                        <button mat-flat-button disabled class="match-input-height w-full sm:w-auto">
+                            <mat-icon>block</mat-icon>
+                            Out of Stock
+                        </button>
+                    } @else {
+                        <button [disabled]="quantity === quantityInCart || !isQuantityValid" 
+                                mat-flat-button 
+                                class="match-input-height w-full sm:w-auto"
+                                (click)="updateCart()">
+                            <mat-icon>shopping_cart</mat-icon>
+                            {{getButtonText()}}
+                        </button>
+                    }
                     <mat-form-field appearance="outline" class="flex w-full sm:w-auto">
                         <mat-label>Quantity</mat-label>
-                        <input matInput min="0" [(ngModel)]="quantity" type="number">
+                        <input matInput 
+                               min="0" 
+                               [max]="maxAvailableQuantity"
+                               [(ngModel)]="quantity" 
+                               (ngModelChange)="onQuantityChange()"
+                               [disabled]="isOutOfStock"
+                               type="number">
                     </mat-form-field>
                 </div>
                 <mat-divider></mat-divider>

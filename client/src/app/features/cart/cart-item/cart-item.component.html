@@ -9,8 +9,10 @@
                     <mat-icon class="text-red-600">remove</mat-icon>
                 </button>
                 <div class="font-semibold text-lg sm:text-xl mb-1">{{item().quantity}}</div>
-                <button mat-icon-button (click)="incrementQuantity()">
-                    <mat-icon class="text-green-600">add</mat-icon>
+                <button mat-icon-button 
+                        (click)="incrementQuantity()"
+                        [disabled]="stockInfo() && item().quantity >= stockInfo()!.availableStock">
+                    <mat-icon [class]="(stockInfo() && item().quantity >= stockInfo()!.availableStock) ? 'text-gray-400' : 'text-green-600'">add</mat-icon>
                 </button>
             </div>
             <div class="text-end order-4 w-24 sm:w-32">
@@ -21,6 +23,14 @@
             <a routerLink="/shop/{{item().productId}}" class="font-medium text-base sm:text-lg">
                 {{item().productName}}
             </a>
+            
+            <!-- Low stock warning -->
+            @if (stockInfo() && maxAvailableQuantity <= 5) {
+                <div class="text-sm text-orange-600">
+                    Only {{maxAvailableQuantity}} left in stock
+                </div>
+            }
+            
             <div class="flex items-center gap-2 sm:gap-4">
                 <button mat-button color="warn" (click)="removeItemFromCart()">
                     <mat-icon>delete</mat-icon>

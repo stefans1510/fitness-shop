@@ -9,5 +9,6 @@ namespace Core.Interfaces
         Task<bool> CommitReservedStock(string reservationId);
         Task<bool> ReleaseReservedStock(string reservationId);
         Task<int> GetAvailableStock(int productId);
+        Task<Product?> GetProduct(int productId);
     }
 }

@@ -6,6 +6,8 @@ import { Product } from '../../shared/models/product';
 import { map, firstValueFrom } from 'rxjs';
 import { DeliveryMethod } from '../../shared/models/deliveryMethod';
 import { ShopService } from './shop.service';
+import { StockService } from './stock.service';
+import { SnackbarService } from './snackbar.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +16,8 @@ export class CartService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
   private shopService = inject(ShopService);
+  private stockService = inject(StockService);
+  private snackbar = inject(SnackbarService);
   cart = signal<Cart | null>(null);
   itemCount = computed(() => {
     return this.cart()?.items.reduce((sum, item) => sum + item.quantity, 0);
@@ -50,15 +54,48 @@ export class CartService {
     });
   }
 
-  addItemToCart(item: CartItem | Product, quantity = 1) {
+  async addItemToCart(item: CartItem | Product, quantity = 1) {
     const cart = this.cart() ?? this.createCart();
 
     if (this.isProduct(item)) {
       item = this.mapProductToCartItem(item);
     }
 
-    cart.items = this.addOrUpdateItem(cart.items, item, quantity);
-    this.setCart(cart);
+    // Check stock availability before adding
+    const productId = this.isProduct(item) ? item.id : item.productId;
+    const currentCartQuantity = this.getCartItemQuantity(productId);
+
+    try {
+      // Get current stock info first
+      const stockInfo = await firstValueFrom(this.stockService.getAvailableStock(productId));
+      
+      if (stockInfo.isOutOfStock) {
+        this.snackbar.error('Sorry, this product is currently out of stock');
+        return;
+      }
+
+      // Calculate how many we can actually add
+      const maxCanAdd = Math.max(0, stockInfo.availableStock - currentCartQuantity);
+      
+      if (maxCanAdd === 0) {
+        // This should rarely happen since button should be disabled, but keep as safety net
+        return;
+      }
+
+      // Add the requested quantity (should always be within limits due to UI constraints)
+      const actualQuantityToAdd = Math.min(quantity, maxCanAdd);
+      
+      // Simple success message
+      this.snackbar.success(`Added ${actualQuantityToAdd} item(s) to cart`);
+
+      // Add the actual quantity we can add
+      cart.items = this.addOrUpdateItem(cart.items, item, actualQuantityToAdd);
+      this.setCart(cart);
+      
+    } catch (error) {
+      console.error('Error checking stock availability:', error);
+      this.snackbar.error('Unable to verify stock availability. Please try again.');
+    }
   }
 
   removeItemFromCart(productId: number, quantity = 1) {
@@ -184,5 +221,53 @@ export class CartService {
   // Force refresh cart prices (useful for manual refresh)
   async refreshCartPrices() {
     await this.updateCartPricesForUserType();
+  }
+
+  // Get current quantity of a product in the cart
+  getCartItemQuantity(productId: number): number {
+    const cart = this.cart();
+    if (!cart) return 0;
+    
+    const item = cart.items.find(x => x.productId === productId);
+    return item ? item.quantity : 0;
+  }
+
+  // Validate entire cart stock availability
+  async validateCartStock(): Promise<{valid: boolean, issues: string[]}> {
+    const cart = this.cart();
+    if (!cart || cart.items.length === 0) {
+      return { valid: true, issues: [] };
+    }
+
+    const issues: string[] = [];
+    
+    try {
+      const stockChecks = cart.items.map(item => ({
+        productId: item.productId,
+        requestedQuantity: item.quantity
+      }));
+
+      const results = await firstValueFrom(
+        this.stockService.checkMultipleStockAvailability(stockChecks)
+      );
+
+      for (const result of results) {
+        if (!result.isAvailable) {
+          const cartItem = cart.items.find(x => x.productId === result.productId);
+          const stockInfo = await firstValueFrom(this.stockService.getAvailableStock(result.productId));
+          
+          if (stockInfo.isOutOfStock) {
+            issues.push(`${cartItem?.productName || 'Product'} is out of stock`);
+          } else {
+            issues.push(`${cartItem?.productName || 'Product'}: only ${stockInfo.availableStock} available (you have ${cartItem?.quantity} in cart)`);
+          }
+        }
+      }
+
+      return { valid: issues.length === 0, issues };
+    } catch (error) {
+      console.error('Error validating cart stock:', error);
+      return { valid: false, issues: ['Unable to validate stock availability'] };
+    }
   }
 }

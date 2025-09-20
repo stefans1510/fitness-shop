@@ -22,8 +22,7 @@ export class InitService {
         tap(user => {
           if (user) {
             this.signalrService.createHubConnection();
-            // Update cart prices based on user type after login
-            setTimeout(() => {
+            setTimeout(() => {  // Update cart prices based on user type after login
               this.cartService.updateCartPricesForUserType();
             }, 100); // Small delay to ensure cart is loaded first
           }

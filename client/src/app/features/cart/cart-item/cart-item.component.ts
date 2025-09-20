@@ -5,8 +5,9 @@ import { MatIcon } from '@angular/material/icon';
 import { MatButton } from '@angular/material/button';
 import { CurrencyPipe } from '@angular/common';
 import { CartService } from '../../../core/services/cart.service';
-import { StockService, StockInfo } from '../../../core/services/stock.service';
+import { StockService } from '../../../core/services/stock.service';
 import { Subject, takeUntil } from 'rxjs';
+import { StockInfo } from '../../../shared/models/stock';
 
 @Component({
   selector: 'app-cart-item',

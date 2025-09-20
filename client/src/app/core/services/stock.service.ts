@@ -2,13 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { Observable, BehaviorSubject, map, tap, forkJoin } from 'rxjs';
-
-export interface StockInfo {
-  productId: number;
-  totalStock: number;
-  availableStock: number;
-  isOutOfStock: boolean;
-}
+import { StockInfo } from '../../shared/models/stock';
 
 @Injectable({
   providedIn: 'root'

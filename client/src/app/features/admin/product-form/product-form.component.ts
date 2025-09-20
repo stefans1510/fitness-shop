@@ -149,10 +149,8 @@ export class ProductFormComponent implements OnInit {
       // Upload the file and get the URL from server
       this.adminService.uploadProductPicture(file).subscribe({
         next: response => {
-          console.log('Upload response:', response);
           // Set the pictureUrl form control to the server URL
           this.productForm.patchValue({ pictureUrl: response.pictureUrl });
-          console.log('Form after patch:', this.productForm.value);
         },
         error: error => {
           console.error('Error uploading image:', error);

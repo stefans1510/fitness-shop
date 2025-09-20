@@ -1,6 +1,7 @@
 <mat-form-field appearance="outline" class="w-full mb-4">
     <mat-label>{{label}}</mat-label>
-    <input [formControl]="control" type={{type}} placeholder={{label}} matInput />
+    <input [formControl]="control" type={{type}} placeholder={{label}} matInput 
+           (input)="onInput($event)" (blur)="onBlur()" />
     @if (control.hasError('required')) {
         <mat-error>{{label}} is required.</mat-error>
     }

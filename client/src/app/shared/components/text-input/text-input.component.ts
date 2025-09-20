@@ -18,18 +18,37 @@ import { MatInput } from '@angular/material/input';
 export class TextInputComponent implements ControlValueAccessor {
   @Input() label = '';
   @Input() type = 'text';
+  
+  private onChange = (value: any) => {};
+  private onTouched = () => {};
 
   constructor(@Self() public controlDir: NgControl) {
     this.controlDir.valueAccessor = this;
   }
   
   writeValue(obj: any): void {
+    // Update the form control's value when set programmatically
+    this.control?.setValue(obj, { emitEvent: false });
   }
 
   registerOnChange(fn: any): void {
+    // Store the callback function to call when input changes
+    this.onChange = fn;
   }
 
   registerOnTouched(fn: any): void {
+    // Store the callback function to call when input is touched
+    this.onTouched = fn;
+  }
+
+  onInput(event: any): void {
+    // Called when user types - notify the form control
+    this.onChange(event.target.value);
+  }
+
+  onBlur(): void {
+    // Called when input loses focus - mark as touched
+    this.onTouched();
   }
 
   get control() {

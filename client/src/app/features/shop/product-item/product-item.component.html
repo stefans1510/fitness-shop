@@ -1,8 +1,13 @@
 @if (product) {
     <mat-card appearance="raised" routerLink="/shop/{{product.id}}" class="product-card h-full flex flex-col" 
              [class.opacity-60]="isOutOfStock">
-        <div class="relative">
-            <img src="{{product.pictureUrl}}">
+        <div class="w-full overflow-hidden flex items-center justify-center bg-gray-100 relative h-64 xs:h-80 md:h-80 lg:h-[400px] xl:h-[450px] 2xl:h-[500px]">
+            <img 
+                src="{{product.pictureUrl}}" 
+                alt="{{product.name}}"
+                class="w-full h-full object-cover object-center bg-gray-50"
+            />
+            
             @if (isOutOfStock) {
                 <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                     <span class="text-white font-bold text-lg">OUT OF STOCK</span>
@@ -14,29 +19,26 @@
             }
         </div>
         <mat-card-content class="mt-2 flex-1 flex flex-col justify-between">
-            <h2 class="text-sm font-semibold uppercase overflow-hidden text-ellipsis whitespace-nowrap">{{product.name}}</h2>
+            <h2 class="text-sm font-semibold uppercase overflow-hidden text-ellipsis whitespace-nowrap mb-1">{{product.name}}</h2>
             <div class="flex flex-col">
                 @if (product.hasDiscount && product.discountedPrice) {
-                    <div class="font-light">
+                    <div class="font-light m-0">
                         <span class="line-through text-gray-500 text-sm">{{product.price | currency}}</span>
                         <span class="text-red-600 font-semibold ml-2">{{product.discountedPrice | currency}}</span>
                     </div>
                 } @else {
-                    <p class="font-light">{{product.price | currency}}</p>
-                }
-                @if (stockInfo() && !isOutOfStock) {
-                    <p class="text-xs text-gray-600 mt-1">{{stockInfo()?.availableStock}} in stock</p>
+                    <p class="font-light m-0">{{product.price | currency}}</p>
                 }
             </div>
         </mat-card-content>
         <mat-card-actions (click)="$event.stopPropagation()">
             @if (isOutOfStock) {
-                <button mat-stroked-button class="w-full border-gray-400" disabled>
+                <button mat-stroked-button class="w-full border-gray-300" disabled>
                     <mat-icon>block</mat-icon>
                     Out of Stock
                 </button>
             } @else {
-                <button mat-stroked-button class="w-full border-gray-400" (click)="cartService.addItemToCart(product)">
+                <button mat-stroked-button class="w-full border-gray-300" (click)="cartService.addItemToCart(product)">
                     <mat-icon>add_shopping_cart</mat-icon>
                     Add to Cart
                 </button>

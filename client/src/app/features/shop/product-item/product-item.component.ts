@@ -6,7 +6,8 @@ import { MatButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../../core/services/cart.service';
-import { StockService, StockInfo } from '../../../core/services/stock.service';
+import { StockService } from '../../../core/services/stock.service';
+import { StockInfo } from '../../../shared/models/stock';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({

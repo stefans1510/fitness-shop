@@ -53,15 +53,38 @@ namespace API.Controllers
         {
             var name = User.FindFirst(ClaimTypes.Name)?.Value;
             var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
             var isAdmin = User.IsInRole("Admin");
-            var roles = User.FindFirst(ClaimTypes.Role)?.Value;
+            var allRoles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+            var allClaims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
 
             return Ok(new
             {
                 name,
                 id,
+                email,
                 isAdmin,
-                roles
+                allRoles,
+                allClaims
+            });
+        }
+
+        [Authorize]
+        [HttpGet("user-claims")]
+        public IActionResult GetUserClaims()
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+            var isAdmin = User.IsInRole("Admin");
+            var allRoles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+            var allClaims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+
+            return Ok(new
+            {
+                email,
+                isAdmin,
+                allRoles,
+                allClaims,
+                isAuthenticated = User.Identity?.IsAuthenticated
             });
         }
     }

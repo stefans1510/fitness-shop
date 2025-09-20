@@ -75,8 +75,8 @@ namespace API.Controllers
                 user.Email,
                 user.CompanyCode,
                 user.IsCompanyUser,
-                Address = user.Address?.ToDto(),
-                Roles = roles
+                address = user.Address?.ToDto(),
+                roles = roles
             });
         }
 

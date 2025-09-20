@@ -64,4 +64,5 @@ export class ProductItemComponent implements OnInit, OnDestroy {
     const stock = this.stockInfo();
     return stock ? stock.availableStock > 0 && stock.availableStock <= 5 : false;
   }
+
 }

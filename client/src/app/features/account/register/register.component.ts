@@ -8,7 +8,7 @@ import { Router, RouterLink } from '@angular/router';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { TextInputComponent } from "../../../shared/components/text-input/text-input.component";
 import { Observable, of } from 'rxjs';
-import { catchError, debounceTime, map, switchMap, take } from 'rxjs/operators';
+import { catchError, debounceTime, map, } from 'rxjs/operators';
 
 @Component({
   selector: 'app-register',

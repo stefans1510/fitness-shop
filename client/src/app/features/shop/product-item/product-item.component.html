@@ -24,6 +24,9 @@
                 } @else {
                     <p class="font-light">{{product.price | currency}}</p>
                 }
+                @if (stockInfo() && !isOutOfStock) {
+                    <p class="text-xs text-gray-600 mt-1">{{stockInfo()?.availableStock}} in stock</p>
+                }
             </div>
         </mat-card-content>
         <mat-card-actions (click)="$event.stopPropagation()">

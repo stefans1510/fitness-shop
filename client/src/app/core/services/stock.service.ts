@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable, BehaviorSubject, map, tap, forkJoin, firstValueFrom } from 'rxjs';
+import { Observable, BehaviorSubject, map, tap, forkJoin } from 'rxjs';
 
 export interface StockInfo {
   productId: number;
@@ -36,12 +36,10 @@ export class StockService {
         .pipe(map(isAvailable => ({ productId: item.productId, isAvailable })))
     );
     
-    // Use forkJoin to wait for all checks to complete
-    return forkJoin(checks);
+    return forkJoin(checks);  // wait for all checks to complete
   }
 
-  // Get cached stock info (useful for UI updates)
-  getCachedStockInfo(productId: number): StockInfo | null {
+  getCachedStockInfo(productId: number): StockInfo | null {  // Get cached stock info (useful for UI updates)
     return this.stockCache.value.get(productId) || null;
   }
 

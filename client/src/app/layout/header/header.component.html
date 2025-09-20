@@ -37,8 +37,10 @@
                 <span>{{accountService.currentUser()?.email}}</span>
             </button>
             } @else {
-            <button routerLink="/account/login" mat-stroked-button class="hidden md:inline border-gray-300">Login</button>
-            <button routerLink="/account/register" mat-stroked-button class="hidden md:inline border-gray-300">Register</button>
+            <button routerLink="/account/login" mat-stroked-button class="hidden md:flex items-center border-none text-lg">
+              <mat-icon class="mr-1">login</mat-icon>
+              Sign In
+            </button>
             }
         </div>
     </div>
@@ -48,9 +50,12 @@
       <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
       <a routerLink="/shop" routerLinkActive="active">Shop</a>
       <a [routerLink]="['/contact']" [class.active]="contactInView || false">Contact</a>
+      <a *appIsAdmin routerLink="/admin" routerLinkActive="active">Admin</a>
       @if (!accountService.currentUser()) {
-        <button routerLink="/account/login" mat-stroked-button class="w-full border-gray-300">Login</button>
-        <button routerLink="/account/register" mat-stroked-button class="w-full border-gray-300">Register</button>
+        <button routerLink="/account/login" mat-stroked-button class="w-full md:flex items-center border-none">
+          <mat-icon class="mr-1">login</mat-icon>
+          Sign In
+        </button>
       } @else {
         <button mat-button class="flex md:hidden items-center w-full justify-between" (click)="toggleDropdown()">
           <span class="flex items-center">

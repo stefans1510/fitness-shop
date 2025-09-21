@@ -3,21 +3,18 @@
     <div class="max-w-screen-lg sm:max-w-screen-xl md:max-w-screen-2xl px-2 sm:px-4 md:px-8 mx-auto">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
             <div class="max-w-full md:max-w-xl mx-auto">
-                <img class="w-full h-auto object-contain" src="{{product.pictureUrl}}" alt="product image">
+                <img class="w-full h-auto max-h-96 md:max-h-[500px] lg:max-h-[600px] object-contain" src="{{product.pictureUrl}}" alt="product image">
             </div>
             <div class="px-2 sm:px-0">
                 <h1 class="text-lg sm:text-2xl font-semibold text-gray-900">{{product.name}}</h1>
                 <p class="text-sm sm:text-base">You have {{quantityInCart}} of this item in your cart.</p>
-                
-                <!-- Stock information -->
+
                 @if (stockInfo()) {
                     <div class="text-sm mt-2">
                         @if (isOutOfStock) {
                             <p class="text-red-600 font-medium">Out of Stock</p>
                         } @else if (maxAvailableQuantity <= 5) {
                             <p class="text-orange-600">Only {{maxAvailableQuantity}} left in stock</p>
-                        } @else {
-                            <p class="text-green-600">{{maxAvailableQuantity}} in stock</p>
                         }
                     </div>
                 }

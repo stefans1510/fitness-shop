@@ -18,6 +18,7 @@ import { CurrencyPipe } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { OrderToCreate, ShippingAddress } from '../../shared/models/order';
 import { OrderService } from '../../core/services/order.service';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 
 @Component({
   selector: 'app-checkout',
@@ -41,6 +42,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   private stripeService = inject(StripeService);
   private accountService = inject(AccountService);
   private orderService = inject(OrderService);
+  private breakpointObserver = inject(BreakpointObserver);
   cartService = inject(CartService);
   addressElement?: StripeAddressElement;
   paymentElement?: StripePaymentElement;
@@ -50,9 +52,15 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   );
   confirmationToken?: ConfirmationToken;
   loading = false;
+  stepperOrientation: 'horizontal' | 'vertical' = 'horizontal';
 
   async ngOnInit() {
     try {
+      // Set stepper orientation based on screen size
+      this.breakpointObserver.observe([Breakpoints.Handset]).subscribe(result => {
+        this.stepperOrientation = result.matches ? 'vertical' : 'horizontal';
+      });
+
       // Check if cart is valid before initializing checkout
       const cart = this.cartService.cart();
       if (!cart || cart.items.length === 0) {

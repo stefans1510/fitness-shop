@@ -1,0 +1,13 @@
+.checkout-stepper {
+  ::ng-deep .mat-stepper-content {
+    @apply p-3 sm:p-4 md:p-6;
+  }
+
+  ::ng-deep .mat-stepper-vertical .mat-stepper-content {
+    @apply ml-0 sm:ml-6;
+  }
+
+  ::ng-deep .mat-stepper-header {
+    @apply px-2 sm:px-4 md:px-6;
+  }
+}

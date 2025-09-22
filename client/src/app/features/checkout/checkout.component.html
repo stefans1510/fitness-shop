@@ -1,10 +1,11 @@
-<div class="flex flex-col lg:flex-row mt-16 lg:mt-32 gap-6 px-2 w-full max-w-6xl mx-auto">
-    <div class="w-full lg:w-3/4">
+<div class="flex flex-col lg:flex-row mt-16 md:mt-24 lg:mt-32 gap-4 md:gap-6 px-2 md:px-4 lg:px-2 w-full max-w-6xl mx-auto">
+    <div class="w-full lg:w-3/4 min-w-0">
         <mat-stepper 
             (selectionChange)="onStepChange($event)" 
             #stepper
             [linear]="true"
-            class="bg-white border-gray-200 shadow-sm">
+            [orientation]="stepperOrientation"
+            class="bg-white border-gray-200 shadow-sm rounded-lg overflow-hidden checkout-stepper">
             <mat-step label="Address" [completed]="completionStatus().address">
                 <div id="address-element"></div>
                 <div class="flex justify-end mt-1">
@@ -12,30 +13,30 @@
                         Save as default address
                     </mat-checkbox>
                 </div>
-                <div class="flex justify-between mt-6">
-                    <button class="z-0" routerLink="/shop" mat-stroked-button>Continue Shopping</button>
-                    <button [disabled]="!completionStatus().address" class="z-0" matStepperNext mat-flat-button>Next</button>
+                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0 mt-6">
+                    <button class="z-0 order-2 sm:order-1" routerLink="/shop" mat-stroked-button>Continue Shopping</button>
+                    <button [disabled]="!completionStatus().address" class="z-0 order-1 sm:order-2" matStepperNext mat-flat-button>Next</button>
                 </div>
             </mat-step>
             <mat-step label="Shipping" [completed]="completionStatus().delivery">
                 <app-checkout-delivery (deliveryComplete)="handleDeliveryChange($event)"></app-checkout-delivery>
-                <div class="flex justify-between mt-6">
+                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0 mt-6">
                     <button matStepperPrevious mat-stroked-button>Back</button>
                     <button [disabled]="!completionStatus().delivery" matStepperNext mat-flat-button>Next</button>
                 </div>
             </mat-step>
             <mat-step label="Payment" [completed]="completionStatus().payment">
                 <div id="payment-element"></div>
-                <div class="flex justify-between mt-6">
+                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0 mt-6">
                     <button matStepperPrevious mat-stroked-button>Back</button>
                     <button [disabled]="!completionStatus().payment" matStepperNext mat-flat-button>Next</button>
                 </div>
             </mat-step>
             <mat-step label="Confirmation">
                 <app-checkout-review [confirmationToken]="confirmationToken"></app-checkout-review>
-                <div class="flex justify-between mt-6">
+                <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-0 mt-6">
                     <button matStepperPrevious mat-stroked-button>Back</button>
-                    <button [disabled]="!confirmationToken || loading" (click)="confirmPayment(stepper)" mat-flat-button>
+                    <button [disabled]="!confirmationToken || loading" (click)="confirmPayment(stepper)" mat-flat-button class="flex-shrink-0">
                         @if (loading) {
                             <mat-spinner diameter="20"></mat-spinner>
                         } @else {

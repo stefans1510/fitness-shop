@@ -26,11 +26,29 @@ namespace API.Controllers
         [HttpPost("{shoppingCartId}")]
         public async Task<ActionResult<ShoppingCart>> CreateOrUpdatePaymentIntent(string shoppingCartId)
         {
-            var shoppingCart = await paymentService.CreateOrUpdatePaymentIntent(shoppingCartId);
+            try
+            {
+                var shoppingCart = await paymentService.CreateOrUpdatePaymentIntent(shoppingCartId);
 
-            if (shoppingCart == null) return BadRequest("Problem with your cart");
+                if (shoppingCart == null) 
+                {
+                    logger.LogWarning("Failed to create/update payment intent for cart {CartId}", shoppingCartId);
+                    return BadRequest(new { 
+                        message = "Your cart has expired or is no longer valid. Please refresh the page and add items to your cart again.",
+                        code = "CART_EXPIRED" 
+                    });
+                }
 
-            return Ok(shoppingCart);
+                return Ok(shoppingCart);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error creating payment intent for cart {CartId}", shoppingCartId);
+                return BadRequest(new { 
+                    message = "Unable to process payment. Please try again or contact support if the problem persists.",
+                    code = "PAYMENT_ERROR" 
+                });
+            }
         }
 
         [HttpGet("delivery-methods")]

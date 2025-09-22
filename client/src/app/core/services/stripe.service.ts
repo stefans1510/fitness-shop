@@ -4,7 +4,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { CartService } from './cart.service';
 import { Cart } from '../../shared/models/cart';
-import { firstValueFrom, map } from 'rxjs';
+import { firstValueFrom, map, catchError, throwError } from 'rxjs';
 import { AccountService } from './account.service';
 
 @Injectable({
@@ -99,6 +99,16 @@ export class StripeService {
       map(cart => {
         this.cartService.setCart(cart);
         return cart;
+      }),
+      catchError((error: any) => {
+        // Handle cart-related errors
+        if (error.status === 400) {
+          console.error('Cart validation failed:', error);
+          // Clear the invalid cart from local storage
+          this.cartService.clearCart();
+          return throwError(() => new Error('Your cart has expired or is no longer valid. Please add items to your cart again.'));
+        }
+        return throwError(() => error);
       })
     );
   }

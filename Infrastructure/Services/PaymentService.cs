@@ -25,7 +25,12 @@ namespace Infrastructure.Services
         {
             var shoppingCart = await shoppingCartService.GetShoppingCartAsync(shoppingCartId);
 
-            if (shoppingCart == null) return null;
+            if (shoppingCart == null) 
+            {
+                // Log the cart retrieval failure for debugging
+                Console.WriteLine($"Shopping cart with ID {shoppingCartId} not found in Redis");
+                return null;
+            }
 
             var shippingPrice = 0m;
 

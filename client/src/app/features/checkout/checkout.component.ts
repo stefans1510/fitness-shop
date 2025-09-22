@@ -53,6 +53,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   async ngOnInit() {
     try {
+      // Check if cart is valid before initializing checkout
+      const cart = this.cartService.cart();
+      if (!cart || cart.items.length === 0) {
+        this.snackbar.error('Your cart is empty. Please add items before proceeding to checkout.');
+        this.router.navigateByUrl('/shop');
+        return;
+      }
+
       this.addressElement = await this.stripeService.createAddressElement();
       this.addressElement.mount('#address-element');
       this.addressElement.on('change', this.handleAddressChange);
@@ -61,6 +69,10 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       this.paymentElement.on('change', this.handlePaymentChange)
     } catch (error: any) {
       this.snackbar.error(error.message);
+      // If cart-related error, redirect to shop
+      if (error.message.includes('cart')) {
+        setTimeout(() => this.router.navigateByUrl('/shop'), 3000);
+      }
     }
   }
 

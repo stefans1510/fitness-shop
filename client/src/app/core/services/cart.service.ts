@@ -174,6 +174,23 @@ export class CartService {
     this.selectedDelivery.set(null);
   }
 
+  // Check if cart is expired and needs to be recreated
+  async validateCart(): Promise<boolean> {
+    const cart = this.cart();
+    if (!cart) return false;
+
+    try {
+      // Try to get the cart from the server to validate it still exists
+      const serverCart = await firstValueFrom(this.getCart(cart.id));
+      return serverCart !== null;
+    } catch (error) {
+      console.error('Cart validation failed:', error);
+      // If cart validation fails, clear it
+      this.clearCart();
+      return false;
+    }
+  }
+
   // Update cart item prices based on current user type (company vs regular user)
   async updateCartPricesForUserType() {
     const cart = this.cart();

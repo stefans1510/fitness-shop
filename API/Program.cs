@@ -60,6 +60,14 @@ app.MapFallbackToController("Index", "Fallback"); //fallback to serve index.html
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
+// Serve Angular files from browser subfolder for Angular 17+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "browser")),
+    RequestPath = ""
+});
+
 try
 {
     using var scope = app.Services.CreateScope();

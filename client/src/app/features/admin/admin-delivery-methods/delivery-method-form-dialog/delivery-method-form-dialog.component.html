@@ -1,0 +1,50 @@
+<h1 mat-dialog-title>{{ title }}</h1>
+<div mat-dialog-content>
+  <form [formGroup]="deliveryMethodForm" class="flex flex-col gap-4">
+    <mat-form-field appearance="outline">
+      <mat-label>Short Name</mat-label>
+      <input matInput formControlName="shortName" placeholder="e.g. Standard, Express">
+      @if (deliveryMethodForm.get('shortName')?.invalid && deliveryMethodForm.get('shortName')?.touched) {
+        <mat-error>
+          Short name is required and must be less than 50 characters
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Delivery Time</mat-label>
+      <input matInput formControlName="deliveryTime" placeholder="e.g. 3-5 business days">
+      @if (deliveryMethodForm.get('deliveryTime')?.invalid && deliveryMethodForm.get('deliveryTime')?.touched) {
+        <mat-error>
+          Delivery time is required and must be less than 100 characters
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="3" placeholder="Detailed description of the delivery method"></textarea>
+      @if (deliveryMethodForm.get('description')?.invalid && deliveryMethodForm.get('description')?.touched) {
+        <mat-error>
+          Description is required and must be less than 500 characters
+        </mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Price</mat-label>
+      <input matInput type="number" formControlName="price" step="0.01" min="0" placeholder="0.00">
+      @if (deliveryMethodForm.get('price')?.invalid && deliveryMethodForm.get('price')?.touched) {
+        <mat-error>
+          Price is required and must be greater than or equal to 0
+        </mat-error>
+      }
+    </mat-form-field>
+  </form>
+</div>
+<div mat-dialog-actions class="flex justify-end gap-2">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="deliveryMethodForm.invalid">
+    {{ isEdit ? 'Update' : 'Create' }}
+  </button>
+</div>

@@ -7,7 +7,9 @@ import { Pagination } from '../../shared/models/pagination';
 import { Order } from '../../shared/models/order';
 import { Product } from '../../shared/models/product';
 import { User } from '../../shared/models/user';
+import { DeliveryMethod } from '../../shared/models/deliveryMethod';
 import { ShopService } from './shop.service';
+import { CheckoutService } from './checkout.service';
 import { tap } from 'rxjs';
 
 @Injectable({
@@ -17,7 +19,9 @@ export class AdminService {
   baseUrl = environment.apiUrl;
   private http = inject(HttpClient);
   private shopService = inject(ShopService);
+  private checkoutService = inject(CheckoutService);
 
+  // Order Management
   getOrders(orderParameters: OrderParameters) {
     let parameters = new HttpParams();
 
@@ -39,6 +43,7 @@ export class AdminService {
     return this.http.post<Order>(this.baseUrl + 'admin/orders/refund/' + id, {});
   }
 
+  // Product Management
   createProduct(product: Product) {
     return this.http.post<Product>(this.baseUrl + 'admin/products', product).pipe(
       tap(() => this.shopService.clearProductCache()) // Clear cache so new brands/types are loaded
@@ -99,5 +104,33 @@ export class AdminService {
 
   createAdminUser(adminUser: any) {
     return this.http.post<{message: string}>(this.baseUrl + 'admin/users/create-admin', adminUser);
+  }
+
+  // Delivery Methods Management
+  getDeliveryMethods() {
+    return this.http.get<DeliveryMethod[]>(this.baseUrl + 'admin/delivery-methods');
+  }
+
+  createDeliveryMethod(deliveryMethod: DeliveryMethod) {
+    return this.http.post<DeliveryMethod>(this.baseUrl + 'admin/delivery-methods', deliveryMethod).pipe(
+      tap(() => this.clearDeliveryMethodsCache()) // Clear cache so new delivery methods are loaded
+    );
+  }
+
+  updateDeliveryMethod(deliveryMethod: DeliveryMethod) {
+    return this.http.put(this.baseUrl + 'admin/delivery-methods/' + deliveryMethod.id, deliveryMethod).pipe(
+      tap(() => this.clearDeliveryMethodsCache()) // Clear cache so updated delivery methods are loaded
+    );
+  }
+
+  deleteDeliveryMethod(id: number) {
+    return this.http.delete<{message?: string}>(this.baseUrl + 'admin/delivery-methods/' + id).pipe(
+      tap(() => this.clearDeliveryMethodsCache()) // Clear cache so deleted delivery methods are removed
+    );
+  }
+
+  private clearDeliveryMethodsCache() {
+    // Clear the checkout service cache
+    this.checkoutService.clearDeliveryMethodsCache();
   }
 }

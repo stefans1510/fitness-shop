@@ -18,7 +18,7 @@ namespace API.Controllers
         UserManager<AppUser> userManager
     ) : BaseApiController
     {
-
+        // Order Management Methods
         [HttpGet("orders")]
         public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetOrders(
             [FromQuery] OrderSpecificationParameters orerSpecParams
@@ -72,6 +72,7 @@ namespace API.Controllers
             return BadRequest("Problem refunding order");
         }
 
+        // Product Management Methods
         [HttpPost("products")]
         public async Task<ActionResult<Product>> CreateProduct(Product product)
         {
@@ -361,6 +362,74 @@ namespace API.Controllers
             await userManager.AddToRoleAsync(user, "Admin");
 
             return Ok(new { message = $"Admin user '{user.Email}' created successfully" });
+        }
+
+        // Delivery Methods Management
+        [HttpGet("delivery-methods")]
+        public async Task<ActionResult<IReadOnlyList<DeliveryMethod>>> GetDeliveryMethods()
+        {
+            return Ok(await unitOfWork.Repository<DeliveryMethod>().ListAllAsync());
+        }
+
+        [HttpPost("delivery-methods")]
+        public async Task<ActionResult<DeliveryMethod>> CreateDeliveryMethod(DeliveryMethod deliveryMethod)
+        {
+            unitOfWork.Repository<DeliveryMethod>().Add(deliveryMethod);
+
+            if (await unitOfWork.Complete())
+            {
+                return CreatedAtAction("GetDeliveryMethods", new { id = deliveryMethod.Id }, deliveryMethod);
+            }
+
+            return BadRequest("Problem creating delivery method");
+        }
+
+        [HttpPut("delivery-methods/{id:int}")]
+        public async Task<ActionResult> UpdateDeliveryMethod(int id, DeliveryMethod deliveryMethod)
+        {
+            if (deliveryMethod.Id != id || !DeliveryMethodExists(id))
+                return BadRequest("Cannot update this delivery method");
+
+            unitOfWork.Repository<DeliveryMethod>().Update(deliveryMethod);
+
+            if (await unitOfWork.Complete())
+            {
+                return NoContent();
+            }
+
+            return BadRequest("Problem updating delivery method");
+        }
+
+        [HttpDelete("delivery-methods/{id:int}")]
+        public async Task<ActionResult> DeleteDeliveryMethod(int id)
+        {
+            var deliveryMethod = await unitOfWork.Repository<DeliveryMethod>().GetByIdAsync(id);
+
+            if (deliveryMethod == null) return NotFound();
+
+            // Check if any orders are using this delivery method
+            var allOrders = await unitOfWork.Repository<Order>().ListAllAsync();
+            
+            if (allOrders.Any(o => o.DeliveryMethod?.Id == id))
+            {
+                return BadRequest(new { 
+                    message = "Cannot delete delivery method as it is being used by existing orders" 
+                });
+            }
+
+            unitOfWork.Repository<DeliveryMethod>().Remove(deliveryMethod);
+
+            if (await unitOfWork.Complete())
+            {
+                return NoContent();
+            }
+
+            return BadRequest("Problem deleting delivery method");
+        }
+
+        private bool DeliveryMethodExists(int id)
+        {
+            return unitOfWork.Repository<DeliveryMethod>().Exists(id);
         }
     }
 }

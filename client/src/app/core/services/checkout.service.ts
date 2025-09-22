@@ -21,4 +21,8 @@ export class CheckoutService {
       })
     );
   }
+
+  clearDeliveryMethodsCache() {
+    this.deliveryMethods = [];
+  }
 }

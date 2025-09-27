@@ -43,20 +43,14 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseMiddleware<ExceptionMiddleware>();
+
 app.UseCors(x => x
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials()
     .WithOrigins("http://localhost:4200", "https://localhost:4200"));
 
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-app.MapGroup("api").MapIdentityApi<AppUser>(); //eg. api/login
-app.MapHub<NotificationHub>("/hub/notifications");
-app.MapFallbackToController("Index", "Fallback"); //fallback to serve index.html for SPA routing
-
+// Static files must come early in the pipeline
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
@@ -67,6 +61,17 @@ app.UseStaticFiles(new StaticFileOptions
         Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "browser")),
     RequestPath = ""
 });
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+// API routes
+app.MapControllers();
+app.MapGroup("api").MapIdentityApi<AppUser>(); //eg. api/login
+app.MapHub<NotificationHub>("/hub/notifications");
+
+// Fallback for SPA routing - must be last
+app.MapFallbackToController("Index", "Fallback");
 
 try
 {

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { AbstractControl, AsyncValidatorFn, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { AbstractControl, AsyncValidatorFn, FormGroup, FormControl, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MatCard } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
@@ -7,6 +7,7 @@ import { AccountService } from '../../../core/services/account.service';
 import { Router, RouterLink } from '@angular/router';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { TextInputComponent } from "../../../shared/components/text-input/text-input.component";
+import { FormErrorHandlerService } from '../../../shared/services/form-error-handler.service';
 import { Observable, of } from 'rxjs';
 import { catchError, debounceTime, map, } from 'rxjs/operators';
 
@@ -24,14 +25,15 @@ import { catchError, debounceTime, map, } from 'rxjs/operators';
   styleUrl: './register.component.scss'
 })
 export class RegisterComponent {
-  private formBuilder = inject(FormBuilder);
   private accountService = inject(AccountService);
   private router = inject(Router);
   private snackbar = inject(SnackbarService);
-  validationErrors?: string[];
+  private formErrorHandler = inject(FormErrorHandlerService);
 
   // Company registration state
   isCompanyRegistration = false;
+
+  registerForm!: FormGroup;
 
   // Async validator for company code uniqueness
   companyCodeAsyncValidator(): AsyncValidatorFn {
@@ -48,14 +50,19 @@ export class RegisterComponent {
     };
   }
 
-  registerForm = this.formBuilder.group({
-    firstName: ['', Validators.required],
-    lastName: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', Validators.required],
-    companyCode: [''],
-    isCompanyRegistration: [false]
-  });
+  constructor() {
+    this.registerForm = new FormGroup({
+      firstName: new FormControl('', [Validators.required]),
+      lastName: new FormControl('', [Validators.required]),
+      email: new FormControl('', [Validators.required, Validators.email]),
+      password: new FormControl('', [Validators.required]),
+      companyCode: new FormControl(''),
+      isCompanyRegistration: new FormControl(false)
+    });
+
+    // Set up automatic server error clearing and live validation - handled by service and TextInputComponent
+    this.formErrorHandler.setupAutoErrorClear(this.registerForm);
+  }
 
   toggleRegistrationType(isCompany: boolean) {
     this.isCompanyRegistration = isCompany;
@@ -91,12 +98,18 @@ export class RegisterComponent {
   }
 
   onSubmit() {
-    this.accountService.register(this.registerForm.value).subscribe({
-      next: () => {
-        this.snackbar.success('Account created successfully - you can now log in');
-        this.router.navigateByUrl('/account/login');
-      },
-      error: errors => this.validationErrors = errors
-    });
+    if (this.registerForm.valid) {
+      this.accountService.register(this.registerForm.value).subscribe({
+        next: () => {
+          this.snackbar.success('Account created successfully - you can now log in');
+          this.router.navigateByUrl('/account/login');
+        },
+        error: errors => {
+          this.formErrorHandler.mapServerErrorsToForm(this.registerForm, errors);
+        }
+      });
+    }
   }
+
+
 }

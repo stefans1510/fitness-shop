@@ -34,15 +34,14 @@
             <app-text-input label="Surname" formControlName="lastName" />
         }
         <app-text-input label="Email Address" formControlName="email" />
-        <app-text-input label="Password" formControlName="password" type="password" />
+        <app-text-input label="Password" formControlName="password" type="password" [isPasswordRequirements]="true" />
         
         <!-- Company Code Field (conditionally visible) -->
         @if (isCompanyRegistration) {
             <div class="animate-in slide-in-from-top">
                 <app-text-input 
                     label="Company Registration Code" 
-                    formControlName="companyCode" 
-                    placeholder="Enter your company registration code (6-20 alphanumeric characters)" />
+                    formControlName="companyCode"/>
                 <p class="justify-center text-sm text-gray-600 mt-1 mb-4">
                     <mat-icon class="mr-1 text-md">info</mat-icon>
                     Company code: 6-20 characters, letters and numbers only. Company users receive 15% discount on all products.
@@ -50,15 +49,6 @@
             </div>
         }
         
-        @if (validationErrors) {
-            <div class="mb-3 p-4 bg-red-100 text-red-600 text-sm sm:text-base">
-                <ul class="list-disc px-3">
-                    @for (error of validationErrors; track $index) {
-                        <li>{{error}}</li>
-                    }
-                </ul>
-            </div>
-        }
         <button [disabled]="registerForm.invalid" mat-flat-button type="submit" class="w-full py-2">
             Register
         </button>

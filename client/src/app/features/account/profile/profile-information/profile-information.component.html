@@ -1,0 +1,57 @@
+<div class="space-y-6">
+  <div>
+    <h3 class="text-lg font-medium text-gray-900 mb-6">Account Information</h3>
+    <div class="bg-gray-50 rounded-lg p-6">
+      @if (user) {
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-500 mb-1">Name</label>
+            <p class="text-base font-medium text-gray-900">{{ user.firstName }}</p>
+          </div>
+          
+          @if (user.isCompanyUser) {
+            <div>
+              <label class="block text-sm font-medium text-gray-500 mb-1">Company Code</label>
+              <p class="text-base font-medium text-gray-900">{{ user.companyCode || 'Not set' }}</p>
+            </div>
+          } @else {
+            <div>
+              <label class="block text-sm font-medium text-gray-500 mb-1">Last Name</label>
+              <p class="text-base font-medium text-gray-900">{{ user.lastName }}</p>
+            </div>
+          }
+          
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-500 mb-1">Email Address</label>
+            <p class="text-base font-medium text-gray-900">{{ user.email }}</p>
+          </div>
+          
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-500 mb-1">Account Type</label>
+            <p class="text-base font-medium text-gray-900">
+              {{ user.isCompanyUser ? 'Company Account' : 'Personal Account' }}
+            </p>
+          </div>
+        </div>
+      } @else {
+        <div class="text-center py-8">
+          <p class="text-gray-500">Loading user information...</p>
+        </div>
+      }
+    </div>
+  </div>
+  
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <div class="flex">
+      <div class="flex-shrink-0">
+        <mat-icon class="text-blue-400">info</mat-icon>
+      </div>
+      <div class="ml-3">
+        <h3 class="text-sm font-medium text-blue-800">Account Information</h3>
+        <div class="mt-2 text-sm text-blue-700">
+          <p>Your personal information is read-only. To make changes, please contact customer support.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

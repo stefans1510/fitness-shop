@@ -65,9 +65,9 @@
         </button>
         @if (dropdownOpen) {
           <div class="flex flex-col gap-1 px-3 py-2 bg-gray-50 rounded shadow max-w-s w-full mx-auto text-sm">
-            <button mat-menu-item class="px-3 w-full text-left" routerLink="/cart">
-              <mat-icon>shopping_cart</mat-icon>
-              My Cart
+            <button mat-menu-item class="px-3 w-full text-left" routerLink="/account/profile">
+              <mat-icon>account_circle</mat-icon>
+              My Profile
             </button>
             <button mat-menu-item class="px-3 w-full text-left" routerLink="/orders">
               <mat-icon>history</mat-icon>
@@ -90,9 +90,9 @@
 }
 
 <mat-menu #menu="matMenu" class="px-3">
-    <button mat-menu-item class="px-3" routerLink="/cart">
-        <mat-icon>shopping_cart</mat-icon>
-        My Cart
+    <button mat-menu-item class="px-3" routerLink="/account/profile">
+        <mat-icon>account_circle</mat-icon>
+        My Profile
     </button>
     <button mat-menu-item class="px-3" routerLink="/orders">
         <mat-icon>history</mat-icon>

@@ -54,14 +54,6 @@ app.UseCors(x => x
 app.UseDefaultFiles();
 app.UseStaticFiles();
 
-// Serve Angular files from browser subfolder for Angular 17+
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "browser")),
-    RequestPath = ""
-});
-
 app.UseAuthentication();
 app.UseAuthorization();
 

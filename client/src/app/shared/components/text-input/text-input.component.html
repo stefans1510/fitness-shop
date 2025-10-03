@@ -1,23 +1,44 @@
 <mat-form-field appearance="outline" class="w-full mb-4">
-    <mat-label>{{label}}</mat-label>
-    <input [formControl]="control" type={{type}} placeholder={{label}} matInput 
-           (input)="onInput($event)" (blur)="onBlur()" />
-    @if (control.hasError('required')) {
-        <mat-error>{{label}} is required.</mat-error>
+  <mat-label>{{label}}</mat-label>
+  <input [formControl]="control" [type]="type" [placeholder]="placeholder || label" matInput 
+         (input)="onInput($event)" (blur)="onBlur()" [errorStateMatcher]="errorMatcher" />
+  @if (control.hasError('required')) {
+    <mat-error>{{label}} is required.</mat-error>
+  }
+  @if (control.hasError('email')) {
+    <mat-error>Email is invalid.</mat-error>
+  }
+  @if (control.hasError('minlength')) {
+    <mat-error>{{label}} must be at least {{control.errors?.['minlength']?.requiredLength}} characters.</mat-error>
+  }
+  @if (control.hasError('maxlength')) {
+    <mat-error>{{label}} cannot exceed {{control.errors?.['maxlength']?.requiredLength}} characters.</mat-error>
+  }
+  @if (control.hasError('pattern')) {
+    @if (type === 'password') {
+      <mat-error>Password must contain at least one digit, one lowercase letter, one uppercase letter, and one special character.</mat-error>
+    } @else {
+      <mat-error>{{label}} can only contain letters and numbers.</mat-error>
     }
-    @if (control.hasError('email')) {
-        <mat-error>Email is invalid.</mat-error>
-    }
-    @if (control.hasError('minlength')) {
-        <mat-error>{{label}} must be at least {{control.errors?.['minlength']?.requiredLength}} characters.</mat-error>
-    }
-    @if (control.hasError('maxlength')) {
-        <mat-error>{{label}} cannot exceed {{control.errors?.['maxlength']?.requiredLength}} characters.</mat-error>
-    }
-    @if (control.hasError('pattern')) {
-        <mat-error>{{label}} can only contain letters and numbers.</mat-error>
-    }
-    @if (control.hasError('companyCodeTaken')) {
-        <mat-error>This company code is already registered.</mat-error>
-    }
+  }
+  @if (control.hasError('companyCodeTaken')) {
+    <mat-error>This company code is already registered.</mat-error>
+  }
+  @if (control.hasError('passwordMismatch')) {
+    <mat-error>Passwords do not match.</mat-error>
+  }
+  @if (control.hasError('minLength')) {
+    <mat-error>Password must be at least 6 characters long</mat-error>
+  } @else if (control.hasError('requiresDigit')) {
+    <mat-error>Password must contain at least one digit (0-9)</mat-error>
+  } @else if (control.hasError('requiresLowercase')) {
+    <mat-error>Password must contain at least one lowercase letter (a-z)</mat-error>
+  } @else if (control.hasError('requiresUppercase')) {
+    <mat-error>Password must contain at least one uppercase letter (A-Z)</mat-error>
+  } @else if (control.hasError('requiresSpecialChar')) {
+    <mat-error>Password must contain at least one special character</mat-error>
+  }
+  @if (control.hasError('serverError')) {
+    <mat-error>{{control.errors?.['serverError']?.message}}</mat-error>
+  }
 </mat-form-field>

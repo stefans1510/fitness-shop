@@ -149,6 +149,51 @@ export class StripeService {
     }
   }
 
+  // Standalone address element for profile (doesn't require payment intent)
+  async createStandaloneAddressElement() {
+    const stripe = await this.getStripeInstance();
+    if (stripe) {
+      try {
+        // Create elements without client secret for address collection only
+        const elements = stripe.elements({
+          mode: 'setup', // Use setup mode for collecting address without payment
+          currency: 'usd', // Required for setup mode
+          appearance: { labels: 'floating' }
+        });
+        
+        const user = await firstValueFrom(this.accountService.getUserInfo());
+        let defaultValues: StripeAddressElementOptions['defaultValues'] = {};
+        
+        if (user) {
+          defaultValues.name = user.firstName + ' ' + user.lastName;
+        }
+        
+        if (user?.address) {
+          defaultValues.address = {
+            line1: user.address.line1,
+            line2: user.address.line2,
+            city: user.address.city,
+            state: user.address.state,
+            country: user.address.country,
+            postal_code: user.address.postalCode
+          }
+        }
+        
+        const options: StripeAddressElementOptions = {
+          mode: 'shipping',
+          defaultValues
+        };
+        
+        return elements.create('address', options);
+      } catch (error) {
+        console.error('Failed to create standalone address element:', error);
+        throw new Error('Failed to initialize address form');
+      }
+    } else {
+      throw new Error('Stripe has not been loaded');
+    }
+  }
+
   disposeElements() {
     this.elements = undefined;
     this.addressElement = undefined;

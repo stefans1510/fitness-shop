@@ -107,5 +107,32 @@ namespace API.Controllers
 
             return Ok(user.Address.ToDto());
         }
+
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<ActionResult> ChangePassword(ChangePasswordDto changePasswordDto)
+        {
+            var user = await signInManager.UserManager.GetUserByEmail(User);
+
+            if (user == null) return Unauthorized();
+
+            var result = await signInManager.UserManager.ChangePasswordAsync(
+                user, 
+                changePasswordDto.CurrentPassword, 
+                changePasswordDto.NewPassword
+            );
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.Code, error.Description);
+                }
+
+                return ValidationProblem();
+            }
+
+            return Ok(new { message = "Password changed successfully" });
+        }
     }
 }

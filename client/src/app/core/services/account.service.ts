@@ -68,6 +68,10 @@ export class AccountService {
     );
   }
 
+  changePassword(passwordData: { currentPassword: string; newPassword: string; confirmPassword: string }) {
+    return this.http.post(this.baseUrl + 'account/change-password', passwordData);
+  }
+
   getAuthState() {
     return this.http.get<{isAuthenticated: boolean}>(this.baseUrl + 'account/auth-status');
   }

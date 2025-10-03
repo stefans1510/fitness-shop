@@ -1,0 +1,40 @@
+<div class="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+  <div class="bg-white shadow-sm border border-gray-200 rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h2 class="text-2xl font-bold text-gray-900">My Profile</h2>
+      <p class="mt-1 text-sm text-gray-600">Manage your account information and settings</p>
+    </div>
+    
+    <mat-tab-group class="profile-tabs" animationDuration="200ms">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mr-2">article_person</mat-icon>
+          Information
+        </ng-template>
+        <div class="p-6">
+          <app-profile-information></app-profile-information>
+        </div>
+      </mat-tab>
+      
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mr-2">location_city</mat-icon>
+          Address
+        </ng-template>
+        <div class="p-6">
+          <app-profile-address></app-profile-address>
+        </div>
+      </mat-tab>
+      
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mr-2">lock</mat-icon>
+          Password
+        </ng-template>
+        <div class="p-6">
+          <app-profile-password></app-profile-password>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

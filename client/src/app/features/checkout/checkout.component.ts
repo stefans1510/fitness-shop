@@ -36,7 +36,7 @@ import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
   templateUrl: './checkout.component.html',
   styleUrl: './checkout.component.scss'
 })
-export class CheckoutComponent implements OnInit, OnDestroy {
+export class CheckoutComponent implements OnInit, OnDestroy { 
   private router = inject(Router);
   private snackbar = inject(SnackbarService);
   private stripeService = inject(StripeService);
@@ -69,6 +69,9 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         return;
       }
 
+      // Force fresh address data by disposing existing elements first
+      this.stripeService.disposeElements();
+      
       this.addressElement = await this.stripeService.createAddressElement();
       this.addressElement.mount('#address-element');
       this.addressElement.on('change', this.handleAddressChange);

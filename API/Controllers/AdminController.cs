@@ -64,6 +64,13 @@ namespace API.Controllers
             {
                 order.Status = OrderStatus.Refunded;
 
+                // Release coupon if one was used, making it available again
+                if (!string.IsNullOrEmpty(order.AppliedCouponCode))
+                {
+                    var couponService = HttpContext.RequestServices.GetRequiredService<ICouponService>();
+                    await couponService.ReleaseCouponAsync(order.Id.ToString());
+                }
+
                 await unitOfWork.Complete();
 
                 return order.ToDto();

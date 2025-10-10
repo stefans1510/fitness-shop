@@ -13,7 +13,8 @@ namespace API.Controllers
     public class OrdersController(
         IShoppingCartService shoppingCartService,
         IUnitOfWork unitOfWork,
-        IInventoryService inventoryService
+        IInventoryService inventoryService,
+        ICouponService couponService
         ) : BaseApiController
     {
         [HttpPost]
@@ -69,21 +70,65 @@ namespace API.Controllers
 
             if (deliveryMethod == null) return BadRequest("No delivery method selected");
 
+            var subtotal = items.Sum(x => x.Price * x.Quantity);
+            var discount = 0m;
+            string? appliedCouponCode = null;
+
+            // Apply coupon if provided
+            if (!string.IsNullOrEmpty(createOrderDto.CouponCode))
+            {
+                var isValidCoupon = await couponService.ValidateCouponAsync(createOrderDto.CouponCode, email, subtotal);
+                if (isValidCoupon)
+                {
+                    discount = await couponService.CalculateDiscountAsync(createOrderDto.CouponCode, subtotal);
+                    appliedCouponCode = createOrderDto.CouponCode;
+                }
+            }
+
+            // Check if payment has already been processed
+            var paymentStatus = OrderStatus.Pending;
+            try
+            {
+                var service = new Stripe.PaymentIntentService();
+                var intent = await service.GetAsync(shoppingCart.PaymentIntentId);
+                if (intent.Status == "succeeded")
+                {
+                    paymentStatus = OrderStatus.PaymentReceived;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't fail order creation
+                Console.WriteLine($"Failed to check payment status: {ex.Message}");
+            }
+
             var order = new Order
             {
                 OrderItems = items,
                 DeliveryMethod = deliveryMethod,
                 ShippingAddress = createOrderDto.ShippingAddress,
-                Subtotal = items.Sum(x => x.Price * x.Quantity),
+                Subtotal = subtotal,
+                DiscountAmount = discount,
+                AppliedCouponCode = appliedCouponCode,
                 PaymentSummary = createOrderDto.PaymentSummary,
                 PaymentIntentId = shoppingCart.PaymentIntentId,
-                BuyerEmail = email
+                BuyerEmail = email,
+                Status = paymentStatus
             };
 
             unitOfWork.Repository<Order>().Add(order);
 
             if (await unitOfWork.Complete())
             {
+                // Record coupon usage after successful order creation
+                if (!string.IsNullOrEmpty(appliedCouponCode) && discount > 0)
+                {
+                    await couponService.UseCouponAsync(appliedCouponCode, email, order.Id.ToString(), discount);
+                }
+
+                // Note: Stock is only reserved at this point, not committed
+                // Stock commitment happens in the webhook when payment is confirmed
+                
                 return order;
             }
 

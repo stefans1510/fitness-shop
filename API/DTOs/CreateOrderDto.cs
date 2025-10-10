@@ -16,5 +16,7 @@ namespace API.DTOs
 
         [Required]
         public PaymentSummary PaymentSummary { get; set; } = null!;
+
+        public string? CouponCode { get; set; }
     }
 }

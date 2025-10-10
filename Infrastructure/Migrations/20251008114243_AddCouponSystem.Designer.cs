@@ -4,6 +4,7 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    partial class ShopContextModelSnapshot : ModelSnapshot
+    [Migration("20251008114243_AddCouponSystem")]
+    partial class AddCouponSystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,7 +166,7 @@ namespace Infrastructure.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsCustomerOnly")
+                    b.Property<bool>("IsCompanyOnly")
                         .HasColumnType("bit");
 
                     b.Property<decimal?>("MaximumDiscountAmount")
@@ -272,18 +275,12 @@ namespace Infrastructure.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AppliedCouponCode")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("BuyerEmail")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DeliveryMethodId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("DiscountAmount")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
@@ -436,21 +433,21 @@ namespace Infrastructure.Migrations
                         new
                         {
                             Id = "admin-id",
-                            ConcurrencyStamp = "c3cc8141-d815-45c5-8ab7-9871c6235516",
+                            ConcurrencyStamp = "3d0db240-2166-4db9-aedd-d2074806e0e7",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
                             Id = "customer-id",
-                            ConcurrencyStamp = "7a763958-91d6-4276-aced-4c0ea3f7adfb",
+                            ConcurrencyStamp = "643bbd5d-5444-460a-a4fd-d2cec9a6d059",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         },
                         new
                         {
                             Id = "company-id",
-                            ConcurrencyStamp = "ae850dd0-346a-48b2-850a-d2bb8ea98d82",
+                            ConcurrencyStamp = "57fc5c3a-4a2b-485b-b2b6-e40d1f61ceb5",
                             Name = "Company",
                             NormalizedName = "COMPANY"
                         });

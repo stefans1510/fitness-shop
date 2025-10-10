@@ -11,11 +11,13 @@ namespace Core.Entities.OrderAggregate
         public PaymentSummary PaymentSummary { get; set; } = null!;
         public List<OrderItem> OrderItems { get; set; } = [];
         public decimal Subtotal { get; set; }
+        public decimal DiscountAmount { get; set; } = 0;
+        public string? AppliedCouponCode { get; set; }
         public OrderStatus Status { get; set; } = OrderStatus.Pending;
         public required string PaymentIntentId { get; set; }
         public decimal GetTotal()
         {
-            return Subtotal + DeliveryMethod.Price;
+            return Subtotal - DiscountAmount + DeliveryMethod.Price;
         }
     }
 }

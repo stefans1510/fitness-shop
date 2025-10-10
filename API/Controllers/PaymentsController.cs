@@ -70,6 +70,7 @@ namespace API.Controllers
                 {
                     if (stripeEvent.Data.Object is PaymentIntent intent)
                     {
+                        logger.LogInformation("Processing payment_intent.succeeded for payment intent {PaymentIntentId}", intent.Id);
                         await HandlePaymentIntentSucceeded(intent);
                     }
                     else
@@ -103,19 +104,30 @@ namespace API.Controllers
             {
                 var specification = new OrderSpecification(intent.Id, true);
                 var order = await unitOfWork.Repository<Core.Entities.OrderAggregate.Order>()
-                    .GetEntityWithSpecification(specification)
-                    ?? throw new Exception("Order not found");
+                    .GetEntityWithSpecification(specification);
+
+                if (order == null)
+                {
+                    logger.LogWarning("Order not found for payment intent {PaymentIntentId}. This might be expected if the order hasn't been created yet.", intent.Id);
+                    // Order might be created shortly after payment, this is normal
+                    return;
+                }
 
                 if ((long)order.GetTotal() * 100 != intent.Amount)
                 {
+                    logger.LogWarning("Payment amount mismatch - Order: {OrderTotal}, Intent: {IntentAmount}", 
+                        order.GetTotal(), intent.Amount / 100m);
                     order.Status = OrderStatus.PaymentMissmatch;
                     // Release reserved stock for payment mismatch
                     await inventoryService.ReleaseReservedStock(intent.Id);
                 }
                 else
                 {
+                    // Update status (might already be PaymentReceived if order was created after payment)
                     order.Status = OrderStatus.PaymentReceived;
+                    
                     // Commit reserved stock - this will reduce actual inventory
+                    // This is safe to call multiple times for the same payment intent
                     var stockCommitted = await inventoryService.CommitReservedStock(intent.Id);
                     if (!stockCommitted)
                     {
@@ -128,11 +140,18 @@ namespace API.Controllers
                 await unitOfWork.Complete();
 
                 var connectionId = NotificationHub.GetConnectionIdByEmail(order.BuyerEmail);
+                logger.LogInformation("Attempting to send SignalR notification for order {OrderId} to email {Email}, connection ID: {ConnectionId}", 
+                    order.Id, order.BuyerEmail, connectionId ?? "null");
 
                 if (!string.IsNullOrEmpty(connectionId))
                 {
                     await hubContext.Clients.Client(connectionId)
                         .SendAsync("OrderCompleteNotification", order.ToDto());  //DTO for checkout success page
+                    logger.LogInformation("SignalR notification sent successfully for order {OrderId}", order.Id);
+                }
+                else
+                {
+                    logger.LogWarning("No SignalR connection found for email {Email}, order {OrderId}", order.BuyerEmail, order.Id);
                 }
             }
         }

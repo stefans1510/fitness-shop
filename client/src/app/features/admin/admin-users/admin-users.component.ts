@@ -9,6 +9,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { AdminService } from '../../../core/services/admin.service';
@@ -33,6 +34,7 @@ import { TextInputComponent } from '../../../shared/components/text-input/text-i
     MatSelectModule,
     MatOptionModule,
     MatTooltipModule,
+    MatChipsModule,
     FormsModule,
     ReactiveFormsModule,
     MatCardModule,
@@ -55,7 +57,7 @@ export class AdminUsersComponent implements OnInit {
   userParameters = new UserParameters();
   
   // Role filtering options
-  roleFilterOptions = ['All', 'Admin', 'Customer', 'Company'];
+  roleFilterOptions = ['All', 'Admin', 'Personal', 'Company'];
   
   // Loading states
   loading = false;
@@ -95,6 +97,15 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
+  getRoleDisplayName(role: string): string {
+    switch (role) {
+      case 'Customer':
+        return 'Personal';
+      default:
+        return role;
+    }
+  }
+
   getRoleClass(role: string): string {
     switch (role) {
       case 'Admin':
@@ -129,6 +140,15 @@ export class AdminUsersComponent implements OnInit {
   onRoleFilterChange() {
     this.userParameters.pageIndex = 1;
     this.loadUsers();
+  }
+
+  mapDisplayRoleToApiRole(displayRole: string): string {
+    switch (displayRole) {
+      case 'Personal':
+        return 'Customer';
+      default:
+        return displayRole;
+    }
   }
 
   onPageChange(event: any) {

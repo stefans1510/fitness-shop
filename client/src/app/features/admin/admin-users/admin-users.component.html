@@ -2,10 +2,10 @@
     <h2 class="text-2xl font-semibold">User Management</h2>
     <div class="flex gap-4 items-center mr-4">
         <mat-form-field appearance="outline" class="w-48">
-            <mat-label>Role Filter</mat-label>
+            <mat-label>Account</mat-label>
             <mat-select [(ngModel)]="userParameters.role" (selectionChange)="onRoleFilterChange()">
                 @for (role of roleFilterOptions; track role) {
-                    <mat-option [value]="role === 'All' ? '' : role">{{role}}</mat-option>
+                    <mat-option [value]="role === 'All' ? '' : mapDisplayRoleToApiRole(role)">{{role}}</mat-option>
                 }
             </mat-select>
         </mat-form-field>
@@ -122,15 +122,15 @@
                     <td mat-cell *matCellDef="let user" class="border-b border-gray-100 py-4 text-gray-800">{{user.lastName || '-'}}</td>
                 </ng-container>
                 <ng-container matColumnDef="userType">
-                    <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">User Type</th>
+                    <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">Account Type</th>
                     <td mat-cell *matCellDef="let user" class="border-b border-gray-100 py-4">
                         <div class="flex flex-col gap-1">
                             <div class="flex gap-1 flex-wrap">
                                 @for (role of user.roles; track role) {
-                                    <span [class]="getRoleClass(role)">
-                                        <mat-icon class="text-sm">{{getRoleIcon(role)}}</mat-icon>
-                                        {{role}}
-                                    </span>
+                                    <mat-chip [class]="getRoleClass(role)" class="flex items-center">
+                                        <mat-icon class="!text-sm !leading-none">{{getRoleIcon(role)}}</mat-icon>
+                                        <span class="ml-1">{{getRoleDisplayName(role)}}</span>
+                                    </mat-chip>
                                 }
                             </div>
                             @if (user.isCompanyUser && user.companyCode) {

@@ -1,28 +1,78 @@
-.role-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border-radius: 9999px;
+mat-chip.role-badge {
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  height: auto !important;
+  min-height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 4px 8px !important;
+  border: none !important;
+  
+  mat-icon {
+    font-size: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+    line-height: 16px !important;
+  }
+  
+  span {
+    font-size: 0.875rem !important;
+    line-height: 1 !important;
+  }
 }
 
-.role-admin {
-  background-color: #fef2f2;
-  color: #991b1b;
+mat-chip.role-admin {
+  background-color: #fef2f2 !important;
+  color: #991b1b !important;
+  border-color: #991b1b !important;
+  
+  mat-icon {
+    color: #991b1b !important;
+  }
+  
+  span {
+    color: #991b1b !important;
+  }
 }
 
-.role-company {
-  background-color: #dbeafe;
-  color: #1e40af;
+mat-chip.role-company {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  border-color: #1e40af !important;
+  
+  mat-icon {
+    color: #1e40af !important;
+  }
+  
+  span {
+    color: #1e40af !important;
+  }
 }
 
-.role-customer {
-  background-color: #dcfce7;
-  color: #166534;
+mat-chip.role-customer {
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+  border-color: #166534 !important;
+  
+  mat-icon {
+    color: #166534 !important;
+  }
+  
+  span {
+    color: #166534 !important;
+  }
 }
 
-.role-default {
-  background-color: #f3f4f6;
-  color: #374151;
+mat-chip.role-default {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+  border-color: #374151 !important;
+  
+  mat-icon {
+    color: #374151 !important;
+  }
+  
+  span {
+    color: #374151 !important;
+  }
 }

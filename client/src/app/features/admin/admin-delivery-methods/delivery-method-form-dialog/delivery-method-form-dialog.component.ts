@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButton } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatFormFieldModule, MatPrefix } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { DeliveryMethod } from '../../../../shared/models/deliveryMethod';
 
@@ -13,7 +13,8 @@ import { DeliveryMethod } from '../../../../shared/models/deliveryMethod';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButton
+    MatButton,
+    MatPrefix
   ],
   templateUrl: './delivery-method-form-dialog.component.html',
   styleUrl: './delivery-method-form-dialog.component.scss'

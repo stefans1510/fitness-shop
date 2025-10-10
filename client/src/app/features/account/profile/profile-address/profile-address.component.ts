@@ -44,7 +44,7 @@ export class ProfileAddressComponent implements AfterViewInit, OnDestroy {
 
     // If element is not visible yet, wait and retry
     if (!checkElement()) {
-      setTimeout(() => this.initializeStripeElement(), 200);
+      setTimeout(() => this.initializeStripeElement(), 100);
       return;
     }
 

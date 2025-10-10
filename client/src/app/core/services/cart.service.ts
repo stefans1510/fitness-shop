@@ -3,8 +3,9 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Cart, CartItem } from '../../shared/models/cart';
 import { Product } from '../../shared/models/product';
-import { map, firstValueFrom } from 'rxjs';
+import { map, firstValueFrom, of, switchMap } from 'rxjs';
 import { DeliveryMethod } from '../../shared/models/deliveryMethod';
+import { Coupon } from '../../shared/models/coupon';
 import { ShopService } from './shop.service';
 import { StockService } from './stock.service';
 import { SnackbarService } from './snackbar.service';
@@ -23,14 +24,16 @@ export class CartService {
     return this.cart()?.items.reduce((sum, item) => sum + item.quantity, 0);
   });
   selectedDelivery = signal<DeliveryMethod | null>(null);
+  appliedCoupon = signal<{code: string, discount: number, type: number} | null>(null);
   totals = computed(() => {
     const cart = this.cart();
     const delivery = this.selectedDelivery();
+    const coupon = this.appliedCoupon();
 
     if (!cart) return null;
     const subtotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const shipping = delivery ? delivery.price : 0;
-    const discount = 0;
+    const discount = coupon ? coupon.discount : 0;
     return {
       subtotal,
       shipping,
@@ -43,6 +46,18 @@ export class CartService {
     return this.http.get<Cart>(this.baseUrl + 'shoppingcart?id=' + id).pipe(
       map(cart => {
         this.cart.set(cart);
+        
+        // Restore coupon state if cart has discount applied
+        if (cart.couponCode && cart.discountAmount && cart.discountAmount > 0) {
+          this.appliedCoupon.set({
+            code: cart.couponCode,
+            discount: cart.discountAmount,
+            type: 1 // Assuming type 1 for now, we might need to store this too
+          });
+        } else {
+          this.appliedCoupon.set(null);
+        }
+        
         return cart;
       })
     );
@@ -124,6 +139,7 @@ export class CartService {
       next: () => {
         localStorage.removeItem('cart_id');
         this.cart.set(null);
+        this.appliedCoupon.set(null);
       }
     })
   }
@@ -172,6 +188,7 @@ export class CartService {
     localStorage.removeItem('cart_id');
     this.cart.set(null);
     this.selectedDelivery.set(null);
+    this.appliedCoupon.set(null);
   }
 
   // Check if cart is expired and needs to be recreated
@@ -286,5 +303,62 @@ export class CartService {
       console.error('Error validating cart stock:', error);
       return { valid: false, issues: ['Unable to validate stock availability'] };
     }
+  }
+
+  // Apply coupon to cart
+  applyCoupon(couponCode: string) {
+    const cart = this.cart();
+    if (!cart) {
+      throw new Error('No cart available');
+    }
+
+    const subtotal = cart.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    
+    return this.http.post<{discount: number, type: number}>(
+      this.baseUrl + 'coupons/validate', 
+      { 
+        code: couponCode, 
+        orderAmount: subtotal,
+        cartId: cart.id 
+      }
+    ).pipe(
+      map(response => {
+        this.appliedCoupon.set({
+          code: couponCode,
+          discount: response.discount,
+          type: response.type
+        });
+        
+        // Update cart with coupon code and discount amount
+        const updatedCart = { ...cart, couponCode: couponCode, discountAmount: response.discount };
+        this.setCart(updatedCart);
+        
+        return response;
+      })
+    );
+  }
+
+  // Remove applied coupon
+  removeCoupon() {
+    this.appliedCoupon.set(null);
+    
+    // Clear coupon from cart
+    const cart = this.cart();
+    if (cart) {
+      const updatedCart = { ...cart, couponCode: undefined, discountAmount: 0 };
+      this.setCart(updatedCart);
+    }
+    
+    return of(null);
+  }
+
+  // Clear coupon when cart is cleared
+  clearCoupon() {
+    this.appliedCoupon.set(null);
+  }
+
+  // Get available coupons for the current user
+  getAvailableCoupons() {
+    return this.http.get<Coupon[]>(this.baseUrl + 'coupons/available');
   }
 }

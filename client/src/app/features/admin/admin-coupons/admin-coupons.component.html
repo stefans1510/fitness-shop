@@ -1,0 +1,210 @@
+<div class="flex justify-between items-center mt-2 max-w-screen-2xl mx-auto">
+    <h2 class="text-2xl font-semibold">Coupon Management</h2>
+</div>
+
+<div class="p-4">
+    <div class="mat-elevation-z2 border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <table mat-table [dataSource]="dataSource" class="bg-white w-full rounded-lg">
+            <!-- ID Column -->
+            <ng-container matColumnDef="id">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">
+                    ID
+                </th>
+                <td mat-cell *matCellDef="let coupon" class="border-b border-gray-100 py-4 text-gray-800">
+                    {{coupon.id}}
+                </td>
+            </ng-container>
+
+            <!-- Code Column -->
+            <ng-container matColumnDef="code">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">
+                    Code
+                </th>
+                <td mat-cell *matCellDef="let coupon" class="border-b border-gray-100 py-4 text-gray-800">
+                    <span class="font-mono font-bold text-blue-600">{{coupon.code}}</span>
+                </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">
+                    Description
+                </th>
+                <td mat-cell *matCellDef="let coupon" class="border-b border-gray-100 py-4 text-gray-800">
+                    {{coupon.description}}
+                </td>
+            </ng-container>
+
+            <!-- Type & Value Column -->
+            <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">
+                    Type
+                </th>
+                <td mat-cell *matCellDef="let coupon" class="border-b border-gray-100 py-4 text-gray-800">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">{{coupon.type}}</span>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Value Column -->
+            <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">
+                    Value
+                </th>
+                <td mat-cell *matCellDef="let coupon" class="border-b border-gray-100 py-4 text-gray-800">
+                    <span class="font-semibold text-green-600">
+                        {{coupon.type === 'Percentage' ? coupon.value + '%' : (coupon.value | currency)}}
+                    </span>
+                </td>
+            </ng-container>
+
+            <!-- Validity Column -->
+            <ng-container matColumnDef="validity">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">
+                    Validity
+                </th>
+                <td mat-cell *matCellDef="let coupon" class="border-b border-gray-100 py-4 text-gray-800">
+                    <div class="text-xs">
+                        <div>From: {{coupon.validFrom | date:'short'}}</div>
+                        <div>Until: {{coupon.validUntil | date:'short'}}</div>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Usage Column -->
+            <ng-container matColumnDef="usage">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">
+                    Usage
+                </th>
+                <td mat-cell *matCellDef="let coupon" class="border-b border-gray-100 py-4 text-gray-800">
+                    <div class="text-sm">
+                        <span class="font-semibold">{{coupon.usageCount}}</span>
+                        <span class="text-gray-500">
+                            / {{coupon.usageLimit || '∞'}}
+                        </span>
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">
+                    Status
+                </th>
+                <td mat-cell *matCellDef="let coupon" class="border-b border-gray-100 py-4 text-gray-800">
+                    <div class="flex flex-col gap-1">
+                        <!-- Active/Inactive Status -->
+                        <mat-chip-set>
+                            <mat-chip [class]="coupon.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                                {{coupon.isActive ? 'Active' : 'Inactive'}}
+                            </mat-chip>
+                        </mat-chip-set>
+                        
+                        <!-- Time-based Status -->
+                        @if (!isExpired(coupon) && !isNotYetValid(coupon) && coupon.isActive) {
+                            <mat-chip-set>
+                                <mat-chip class="bg-blue-100">Valid Now</mat-chip>
+                            </mat-chip-set>
+                        }
+                        
+                        @if (isExpired(coupon)) {
+                            <mat-chip-set>
+                                <mat-chip class="bg-orange-100">Expired</mat-chip>
+                            </mat-chip-set>
+                        }
+                        
+                        @if (isNotYetValid(coupon)) {
+                            <mat-chip-set>
+                                <mat-chip class="bg-yellow-100">Pending</mat-chip>
+                            </mat-chip-set>
+                        }
+
+                        <!-- Customer Only -->
+                        @if (coupon.isCustomerOnly) {
+                            <mat-chip-set>
+                                <mat-chip class="bg-purple-100 text-purple-800">Customer Only</mat-chip>
+                            </mat-chip-set>
+                        }
+                    </div>
+                </td>
+            </ng-container>
+
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200">
+                    Actions
+                </th>
+                <td mat-cell *matCellDef="let coupon" class="border-b border-gray-100 py-4">
+                    <div class="flex gap-2">
+                        <!-- View Stats -->
+                        <button (click)="viewUsageStats(coupon)" 
+                                matTooltip="View Usage Statistics" 
+                                mat-icon-button 
+                                class="hover:bg-blue-50">
+                            <mat-icon class="text-blue-800">analytics</mat-icon>
+                        </button>
+
+                        <!-- Edit Button -->
+                        <button (click)="openEditDialog(coupon)" 
+                                matTooltip="Edit Coupon" 
+                                mat-icon-button 
+                                class="hover:bg-blue-50">
+                            <mat-icon class="text-blue-800">edit</mat-icon>
+                        </button>
+
+                        <!-- Toggle Status -->
+                        @if (coupon.isActive) {
+                            <button (click)="toggleCouponStatus(coupon)" 
+                                    matTooltip="Deactivate Coupon" 
+                                    mat-icon-button 
+                                    class="hover:bg-orange-50">
+                                <mat-icon class="text-orange-600">pause_circle</mat-icon>
+                            </button>
+                        } @else {
+                            <button (click)="toggleCouponStatus(coupon)" 
+                                    matTooltip="Activate Coupon" 
+                                    mat-icon-button 
+                                    class="hover:bg-green-50">
+                                <mat-icon class="text-green-600">play_circle</mat-icon>
+                            </button>
+                        }
+
+                        <!-- Delete Button -->
+                        <button (click)="deleteCoupon(coupon)" 
+                                matTooltip="Delete Coupon" 
+                                mat-icon-button 
+                                class="hover:bg-red-50">
+                            <mat-icon class="text-red-600">delete</mat-icon>
+                        </button>
+                    </div>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns" class="bg-gray-50"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50 transition-colors"></tr>
+        </table>
+
+        <!-- Empty State -->
+        @if (!loading() && coupons().length === 0) {
+            <div class="p-8 text-center text-gray-500">
+                <h3 class="text-lg font-medium mb-2">No coupons found</h3>
+                <p>Create your first coupon to get started with discount management.</p>
+            </div>
+        }
+
+        <!-- Loading State -->
+        @if (loading()) {
+            <div class="p-8 text-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                <p class="mt-4 text-gray-500">Loading coupons...</p>
+            </div>
+        }
+    </div>
+</div>
+
+<button mat-raised-button 
+        (click)="openCreateDialog()" 
+        class="flex items-center float-end mr-4">
+   <mat-icon>add</mat-icon> New Coupon
+</button>

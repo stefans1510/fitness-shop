@@ -5,6 +5,7 @@ import { AdminOrdersComponent } from "./admin-orders/admin-orders.component";
 import { AdminProductsComponent } from "./admin-products/admin-products.component";
 import { AdminCategoriesComponent } from "./admin-categories/admin-categories.component";
 import { AdminDeliveryMethodsComponent } from "./admin-delivery-methods/admin-delivery-methods.component";
+import { AdminCouponsComponent } from "./admin-coupons/admin-coupons.component";
 import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
@@ -16,7 +17,8 @@ import { ActivatedRoute, Router } from '@angular/router';
     AdminOrdersComponent,
     AdminProductsComponent,
     AdminCategoriesComponent,
-    AdminDeliveryMethodsComponent
+    AdminDeliveryMethodsComponent,
+    AdminCouponsComponent
 ],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.scss'
@@ -51,7 +53,8 @@ export class AdminComponent implements OnInit {
       case 'products': return 1;
       case 'categories': return 2;
       case 'delivery-methods': return 3;
-      case 'users': return 4;
+      case 'coupons': return 4;
+      case 'users': return 5;
       default: return 0;
     }
   }
@@ -62,7 +65,8 @@ export class AdminComponent implements OnInit {
       case 1: return 'products';
       case 2: return 'categories';
       case 3: return 'delivery-methods';
-      case 4: return 'users';
+      case 4: return 'coupons';
+      case 5: return 'users';
       default: return 'orders';
     }
   }

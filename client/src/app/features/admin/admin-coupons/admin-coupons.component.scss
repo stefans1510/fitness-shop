@@ -1,0 +1,38 @@
+.mat-mdc-table {
+  .mat-mdc-header-cell {
+    font-weight: 600;
+    color: #374151;
+  }
+  
+  .mat-mdc-cell {
+    padding: 16px 12px;
+  }
+}
+
+.coupon-code {
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  color: primary;
+}
+
+.status-chips {
+  .mat-mdc-chip {
+    font-size: 0.75rem;
+    height: 24px;
+    font-weight: 500;
+  }
+}
+
+.empty-state {
+  .mat-icon {
+    font-size: 4rem;
+    width: 4rem;
+    height: 4rem;
+  }
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border-width: 2px;
+}

@@ -38,8 +38,6 @@ export class ProfilePasswordComponent {
     this.formErrorHandler.setupAutoErrorClear(this.passwordForm);
   }
 
-
-
   onSubmit() {
     if (this.passwordForm.valid) {
       const formValue = this.passwordForm.value;
@@ -68,6 +66,4 @@ export class ProfilePasswordComponent {
   get isFormValid() {
     return this.passwordForm.valid;
   }
-
-
 }

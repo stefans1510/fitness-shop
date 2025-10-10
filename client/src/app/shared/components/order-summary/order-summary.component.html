@@ -7,10 +7,19 @@
                     <dt class="font-medium text-gray-500">Subtotal</dt>
                     <dd class="font-medium text-gray-900">{{cartService.totals()?.subtotal | currency}}</dd>
                 </dl>
-                <dl class="flex items-center justify-between gap-4">
-                    <dt class="font-medium text-gray-500">Discount</dt>
-                    <dd class="font-medium text-green-600">{{cartService.totals()?.discount | currency}}</dd>
-                </dl>
+                @if (cartService.appliedCoupon()) {
+                    <dl class="flex items-center justify-between gap-4">
+                        <dt class="font-medium text-gray-500">
+                            Discount ({{cartService.appliedCoupon()?.code}})
+                            <button (click)="removeCoupon()" 
+                                    class="ml-2 text-md text-red-600 hover:text-red-800"
+                                    type="button">
+                                ×
+                            </button>
+                        </dt>
+                        <dd class="font-medium text-green-600">-{{cartService.totals()?.discount | currency}}</dd>
+                    </dl>
+                }
                 <dl class="flex items-center justify-between gap-4">
                     <dt class="font-medium text-gray-500">Delivery fee</dt>
                     <dd class="font-medium text-gray-900">{{cartService.totals()?.shipping | currency}}</dd>
@@ -28,16 +37,28 @@
         </div>
         }
     </div>
-    <div class="space-y-4 rounded-lg border border-gray-200 bg-white shadow-sm">
-        <form class="space-y-2 flex flex-col p-2">
-            <label class="mb-2 block text-sm font-medium">
-                Have a voucher code?
-            </label>
-            <mat-form-field appearance="outline">
-                <mat-label>Voucher code</mat-label>
-                <input type="text" matInput>
-            </mat-form-field>
-            <button mat-flat-button>Apply Code</button>
-        </form>
-    </div>
+    @if (!cartService.appliedCoupon()) {
+        <div class="space-y-4 rounded-lg border border-gray-200 bg-white shadow-sm">
+            <form [formGroup]="couponForm" (ngSubmit)="applyCoupon()" class="space-y-2 flex flex-col p-2">
+                <label class="mb-2 block text-sm font-medium">
+                    Have a voucher code?
+                </label>
+                <mat-form-field appearance="outline">
+                    <mat-label>Voucher code</mat-label>
+                    <input type="text" matInput formControlName="code"
+                           style="text-transform: uppercase;">
+                    @if (couponForm.get('code')?.hasError('maxlength')) {
+                        <mat-error>Coupon code is too long</mat-error>
+                    }
+                </mat-form-field>
+                <button mat-flat-button type="submit" [disabled]="!couponForm.valid || isApplyingCoupon || !couponForm.get('code')?.value?.trim()">
+                    @if (isApplyingCoupon) {
+                        Applying...
+                    } @else {
+                        Apply Code
+                    }
+                </button>
+            </form>
+        </div>
+    }
 </div>

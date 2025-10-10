@@ -153,6 +153,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
             this.orderService.orderComplete = true;
             this.cartService.deleteCart();
             this.cartService.selectedDelivery.set(null);
+            this.cartService.appliedCoupon.set(null);
             this.router.navigateByUrl('/checkout/success');
           } else {
             throw new Error('Order creation failed');
@@ -180,6 +181,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       throw new Error('Problem creating order');
     }
 
+    const appliedCoupon = this.cartService.appliedCoupon();
+
     return {
       cartId: cart.id,
       paymentSummary: {
@@ -189,7 +192,8 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         expYear: card.exp_year
       },
       deliveryMethodId: cart.deliveryMethodId,
-      shippingAddress
+      shippingAddress,
+      couponCode: appliedCoupon?.code
     }
   }
 

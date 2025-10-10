@@ -61,10 +61,17 @@
             <dt class="font-medium text-gray-500">Subtotal</dt>
             <dd class="font-medium text-gray-900">{{order.subtotal | currency}}</dd>
           </dl>
-          <dl class="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
-            <dt class="font-medium text-gray-500">Discount</dt>
-            <dd class="font-medium text-green-600">$0.00</dd>
-          </dl>
+          @if (order.discountAmount > 0) {
+            <dl class="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+              <dt class="font-medium text-gray-500">
+                Discount
+                @if (order.appliedCouponCode) {
+                  <span class="text-sm text-blue-800">({{order.appliedCouponCode}})</span>
+                }
+              </dt>
+              <dd class="font-medium text-green-600">-{{order.discountAmount | currency}}</dd>
+            </dl>
+          }
           <dl class="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
             <dt class="font-medium text-gray-500">Delivery fee</dt>
             <dd class="font-medium text-gray-900">{{order.shippingPrice| currency}}</dd>

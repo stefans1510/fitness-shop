@@ -8,6 +8,8 @@ export type Order = {
   paymentSummary: PaymentSummary
   orderItems: OrderItem[]
   subtotal: number
+  discountAmount: number
+  appliedCouponCode?: string
   status: string
   total: number
   paymentIntentId: string
@@ -43,4 +45,5 @@ export type OrderToCreate = {
     deliveryMethodId: number
     shippingAddress: ShippingAddress
     paymentSummary: PaymentSummary
+    couponCode?: string
 }

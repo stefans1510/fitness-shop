@@ -8,6 +8,7 @@ import { Order } from '../../shared/models/order';
 import { Product } from '../../shared/models/product';
 import { User } from '../../shared/models/user';
 import { DeliveryMethod } from '../../shared/models/deliveryMethod';
+import { Coupon, CreateCouponDto } from '../../shared/models/coupon';
 import { ShopService } from './shop.service';
 import { CheckoutService } from './checkout.service';
 import { tap } from 'rxjs';
@@ -132,5 +133,40 @@ export class AdminService {
   private clearDeliveryMethodsCache() {
     // Clear the checkout service cache
     this.checkoutService.clearDeliveryMethodsCache();
+  }
+
+  // Coupon Management
+  getCoupons() {
+    return this.http.get<Coupon[]>(this.baseUrl + 'coupons');
+  }
+
+  getCouponById(id: number) {
+    return this.http.get<Coupon>(this.baseUrl + 'coupons/' + id);
+  }
+
+  createCoupon(coupon: CreateCouponDto) {
+    return this.http.post<Coupon>(this.baseUrl + 'coupons', coupon);
+  }
+
+  updateCoupon(id: number, coupon: CreateCouponDto) {
+    return this.http.put<Coupon>(this.baseUrl + 'coupons/' + id, coupon);
+  }
+
+  deactivateCoupon(id: number) {
+    return this.http.put<{message: string}>(this.baseUrl + 'coupons/' + id + '/deactivate', {});
+  }
+
+  activateCoupon(id: number) {
+    return this.http.put<{message: string}>(this.baseUrl + 'coupons/' + id + '/activate', {});
+  }
+
+  deleteCoupon(id: number) {
+    return this.http.delete<{message: string}>(this.baseUrl + 'coupons/' + id);
+  }
+
+  getCouponUsageStats(couponCode: string) {
+    return this.http.get<{totalUsage: number, usageLimit?: number, remainingUses?: number}>(
+      this.baseUrl + 'coupons/' + encodeURIComponent(couponCode) + '/usage'
+    );
   }
 }

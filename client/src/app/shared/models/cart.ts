@@ -6,6 +6,8 @@ export type CartType = {
     deliveryMethodId?: number;
     paymentIntentId?: string;
     clientSecret?: string;
+    discountAmount?: number;
+    couponCode?: string;
 }
 
 export type CartItem = {
@@ -24,4 +26,6 @@ export class Cart implements CartType {
     deliveryMethodId?: number;
     paymentIntentId?: string;
     clientSecret?: string;
+    discountAmount?: number;
+    couponCode?: string;
 }

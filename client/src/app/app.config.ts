@@ -7,6 +7,8 @@ import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { InitService } from './core/services/init.service';
 import { lastValueFrom } from 'rxjs';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 function initializeApp() {
   const initService = inject(InitService); 
@@ -28,6 +30,8 @@ export const appConfig: ApplicationConfig = {
       loadingInterceptor,
       authInterceptor
     ])),
-    provideAppInitializer(initializeApp)
+    provideAppInitializer(initializeApp),
+    provideAnimationsAsync(),
+    provideNativeDateAdapter()
   ]
 };

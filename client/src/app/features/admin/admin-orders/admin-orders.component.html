@@ -21,7 +21,7 @@
                 <td mat-cell *matCellDef="let order" class="border-b border-gray-100 py-4 text-gray-800"> {{order.buyerEmail}} </td>
             </ng-container>
             <ng-container matColumnDef="orderDate">
-                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Date </th>
+                <th mat-header-cell *matHeaderCellDef class="bg-gray-50 text-gray-700 font-semibold text-sm border-b border-gray-200"> Date & Time</th>
                 <td mat-cell *matCellDef="let order" class="border-b border-gray-100 py-4 text-gray-800"> {{order.orderDate | date: 'short'}} </td>
             </ng-container>
             <ng-container matColumnDef="total">

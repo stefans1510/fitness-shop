@@ -9,7 +9,7 @@
             [showFirstLastButtons]="true"
             [pageSizeOptions]="pageSizeOptions"
             [pageIndex]="shopParams.pageIndex - 1"
-            aria-label="Slect page"
+            aria-label="Select page"
         >
         </mat-paginator>
 
@@ -46,7 +46,9 @@
     </div>
     <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full items-stretch">
         @for (product of products.data; track product.id) {
-        <app-product-item [product]="product" class="h-full min-h-[260px] flex flex-col" />
+        <app-product-item [product]="product" 
+                         (productNavigation)="onProductNavigation($event)"
+                         class="h-full min-h-[260px] flex flex-col" />
         }
     </div>
 </div>

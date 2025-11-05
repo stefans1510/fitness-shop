@@ -14,6 +14,8 @@ import { Pagination } from '../../shared/models/pagination';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { EmptyStateComponent } from "../../shared/components/empty-state/empty-state.component";
+import { ScrollPositionService } from '../../core/services/scroll-position.service';
+import { ShopState } from '../../shared/models/shopState';
 
 @Component({
   selector: 'app-shop',
@@ -36,6 +38,7 @@ export class ShopComponent implements AfterViewInit, OnDestroy {
   private shopService = inject(ShopService);
   private dialogService = inject(MatDialog);
   private route = inject(ActivatedRoute);
+  private scrollPositionService = inject(ScrollPositionService);
   private scrollHandler = () => this.checkScrollPosition();
   products?: Pagination<Product>;
   sortOptions = [
@@ -50,12 +53,22 @@ export class ShopComponent implements AfterViewInit, OnDestroy {
   constructor(private elRef: ElementRef) {}
 
   ngOnInit(): void {
-    this.initializeShop(); // Initial load for brands/types/products
+    // Check if we're returning from product details and restore state
+    const savedState = this.scrollPositionService.getShopState();
+    if (savedState) {
+      this.restoreShopState(savedState);
+    } else {
+      this.initializeShop(); // Initial load for brands/types/products
+    }
+
     this.route.queryParamMap.subscribe(params => {
-      const typeParam = params.get('type');
-      this.shopParams.types = typeParam ? [typeParam] : [];
-      const brandParam = params.get('brand');
-      this.shopParams.brands = brandParam ? [brandParam] : [];
+      // Only update from query params if we're not restoring from saved state
+      if (!savedState) {
+        const typeParam = params.get('type');
+        this.shopParams.types = typeParam ? [typeParam] : [];
+        const brandParam = params.get('brand');
+        this.shopParams.brands = brandParam ? [brandParam] : [];
+      }
       this.getProducts(); // Only update products on filter change
     });
   }
@@ -83,9 +96,27 @@ export class ShopComponent implements AfterViewInit, OnDestroy {
 
   getProducts() {
     this.shopService.getProducts(this.shopParams).subscribe({
-      next: response => this.products = response,
+      next: response => {
+        this.products = response;
+        // After products are loaded, check if we need to restore scroll position
+        this.restoreScrollPosition();
+      },
       error: error => console.log(error)
     })
+  }
+
+  private restoreScrollPosition() {
+    const savedState = this.scrollPositionService.getShopState();
+    if (savedState && savedState.scrollPosition > 0) {
+      // Use a longer timeout to ensure DOM is fully rendered
+      setTimeout(() => {
+        window.scrollTo({
+          top: savedState.scrollPosition,
+          behavior: 'auto'
+        });
+        this.scrollPositionService.clearShopState();
+      }, 500);
+    }
   }
 
   onSearchChange() {
@@ -134,6 +165,38 @@ export class ShopComponent implements AfterViewInit, OnDestroy {
     const windowHeight = window.innerHeight;
     // Show only if bottom of shop is visible on any screen size
     this.showBackToTop = rect.bottom <= windowHeight + 10;
+  }
+
+  private restoreShopState(savedState: ShopState) {
+    // Restore shop parameters
+    this.shopParams.pageIndex = savedState.pageIndex;
+    this.shopParams.pageSize = savedState.pageSize;
+    this.shopParams.search = savedState.search || '';
+    this.shopParams.sort = savedState.sort || '';
+    this.shopParams.types = savedState.types || [];
+    this.shopParams.brands = savedState.brands || [];
+
+    // Subscribe to brands and types to ensure they're loaded into cache
+    this.shopService.getBrands().subscribe();
+    this.shopService.getTypes().subscribe();
+  }
+
+  private saveCurrentShopState() {
+    const currentState: ShopState = {
+      scrollPosition: window.pageYOffset,
+      pageIndex: this.shopParams.pageIndex,
+      pageSize: this.shopParams.pageSize,
+      search: this.shopParams.search,
+      sort: this.shopParams.sort,
+      types: [...this.shopParams.types],
+      brands: [...this.shopParams.brands]
+    };
+    this.scrollPositionService.saveShopState(currentState);
+  }
+
+  onProductNavigation(productId: number) {
+    // Save current shop state before navigating to product details
+    this.saveCurrentShopState();
   }
 
   scrollToTop() {

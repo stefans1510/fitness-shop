@@ -1,5 +1,5 @@
 @if (product) {
-    <mat-card appearance="raised" routerLink="/shop/{{product.id}}" class="product-card h-full flex flex-col" 
+    <mat-card appearance="raised" (click)="navigateToProduct()" class="product-card h-full flex flex-col cursor-pointer" 
              [class.opacity-60]="isOutOfStock">
         <div class="w-full overflow-hidden flex items-center justify-center bg-gray-100 relative h-64 xs:h-80 md:h-80 lg:h-[400px] xl:h-[450px] 2xl:h-[500px]">
             <img 

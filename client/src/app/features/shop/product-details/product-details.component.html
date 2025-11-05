@@ -1,75 +1,82 @@
 @if (product) {
 <section class="py-6 sm:py-8">
     <div class="max-w-screen-lg sm:max-w-screen-xl md:max-w-screen-2xl px-2 sm:px-4 md:px-8 mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
-            <div class="max-w-full md:max-w-xl mx-auto">
-                <img class="w-full h-auto max-h-96 md:max-h-[500px] lg:max-h-[600px] object-contain" src="{{product.pictureUrl}}" alt="product image">
-            </div>
-            <div class="px-2 sm:px-0">
-                <h1 class="text-lg sm:text-2xl font-semibold text-gray-900">{{product.name}}</h1>
-                <p class="text-sm sm:text-base">You have {{quantityInCart}} of this item in your cart.</p>
+        <!-- Back Button -->
+        <div class="mb-4">
+            <button mat-stroked-button (click)="goBack()" class="border-gray-300">
+                <mat-icon>arrow_back</mat-icon>
+                Back to Shop
+            </button>
+        </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8">
+                <div class="max-w-full md:max-w-xl mx-auto">
+                    <img class="w-full h-auto max-h-96 md:max-h-[500px] lg:max-h-[600px] object-contain" src="{{product.pictureUrl}}" alt="product image">
+                </div>
+                <div class="px-2 sm:px-0">
+                    <h1 class="text-lg sm:text-2xl font-semibold text-gray-900">{{product.name}}</h1>
+                    <p class="text-sm sm:text-base">You have {{quantityInCart}} of this item in your cart.</p>
 
-                @if (stockInfo()) {
-                    <div class="text-sm mt-2">
-                        @if (isOutOfStock) {
-                            <p class="text-red-600 font-medium">Out of Stock</p>
-                        } @else if (maxAvailableQuantity <= 5) {
-                            <p class="text-orange-600">Only {{maxAvailableQuantity}} left in stock</p>
-                        }
-                    </div>
-                }
-                
-                <div class="mt-2 sm:mt-4 items-center gap-2 sm:gap-4 flex">
-                    @if (product.hasDiscount && product.discountedPrice) {
-                        <div class="flex flex-col">
-                            <p class="text-lg sm:text-xl line-through text-gray-500">
+                    @if (stockInfo()) {
+                        <div class="text-sm mt-2">
+                            @if (isOutOfStock) {
+                                <p class="text-red-600 font-medium">Out of Stock</p>
+                            } @else if (maxAvailableQuantity <= 5) {
+                                <p class="text-orange-600">Only {{maxAvailableQuantity}} left in stock</p>
+                            }
+                        </div>
+                    }
+                    
+                    <div class="mt-2 sm:mt-4 items-center gap-2 sm:gap-4 flex">
+                        @if (product.hasDiscount && product.discountedPrice) {
+                            <div class="flex flex-col">
+                                <p class="text-lg sm:text-xl line-through text-gray-500">
+                                    {{product.price | currency}}
+                                </p>
+                                <p class="text-xl sm:text-3xl font-extrabold text-red-600">
+                                    {{product.discountedPrice | currency}}
+                                </p>
+                                <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded w-fit mt-1">
+                                    15% OFF - Company Discount
+                                </span>
+                            </div>
+                        } @else {
+                            <p class="text-xl sm:text-3xl font-extrabold text-gray-900">
                                 {{product.price | currency}}
                             </p>
-                            <p class="text-xl sm:text-3xl font-extrabold text-red-600">
-                                {{product.discountedPrice | currency}}
-                            </p>
-                            <span class="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded w-fit mt-1">
-                                15% OFF - Company Discount
-                            </span>
-                        </div>
-                    } @else {
-                        <p class="text-xl sm:text-3xl font-extrabold text-gray-900">
-                            {{product.price | currency}}
-                        </p>
-                    }
+                        }
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-4 sm:mt-6">
+                        @if (isOutOfStock) {
+                            <button mat-flat-button disabled class="match-input-height w-full sm:w-auto">
+                                <mat-icon>block</mat-icon>
+                                Out of Stock
+                            </button>
+                        } @else {
+                            <button [disabled]="quantity === quantityInCart || !isQuantityValid" 
+                                    mat-flat-button 
+                                    class="match-input-height w-full sm:w-auto"
+                                    (click)="updateCart()">
+                                <mat-icon>shopping_cart</mat-icon>
+                                {{getButtonText()}}
+                            </button>
+                        }
+                        <mat-form-field appearance="outline" class="flex w-full sm:w-auto">
+                            <mat-label>Quantity</mat-label>
+                            <input matInput 
+                                   min="0" 
+                                   [max]="maxAvailableQuantity"
+                                   [(ngModel)]="quantity" 
+                                   (ngModelChange)="onQuantityChange()"
+                                   [disabled]="isOutOfStock"
+                                   type="number">
+                        </mat-form-field>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <p class="mt-4 sm:mt-5 text-gray-600 text-sm sm:text-base">
+                        {{product.description}}
+                    </p>
                 </div>
-                <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-4 sm:mt-6">
-                    @if (isOutOfStock) {
-                        <button mat-flat-button disabled class="match-input-height w-full sm:w-auto">
-                            <mat-icon>block</mat-icon>
-                            Out of Stock
-                        </button>
-                    } @else {
-                        <button [disabled]="quantity === quantityInCart || !isQuantityValid" 
-                                mat-flat-button 
-                                class="match-input-height w-full sm:w-auto"
-                                (click)="updateCart()">
-                            <mat-icon>shopping_cart</mat-icon>
-                            {{getButtonText()}}
-                        </button>
-                    }
-                    <mat-form-field appearance="outline" class="flex w-full sm:w-auto">
-                        <mat-label>Quantity</mat-label>
-                        <input matInput 
-                               min="0" 
-                               [max]="maxAvailableQuantity"
-                               [(ngModel)]="quantity" 
-                               (ngModelChange)="onQuantityChange()"
-                               [disabled]="isOutOfStock"
-                               type="number">
-                    </mat-form-field>
-                </div>
-                <mat-divider></mat-divider>
-                <p class="mt-4 sm:mt-5 text-gray-600 text-sm sm:text-base">
-                    {{product.description}}
-                </p>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 }

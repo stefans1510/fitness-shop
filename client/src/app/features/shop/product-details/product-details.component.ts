@@ -14,6 +14,7 @@ import { StockInfo } from '../../../shared/models/stock';
 import { SnackbarService } from '../../../core/services/snackbar.service';
 import { FormsModule } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-product-details',
@@ -36,6 +37,7 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
   private cartService = inject(CartService);
   private stockService = inject(StockService);
   private snackbar = inject(SnackbarService);
+  private location = inject(Location);
   private destroy$ = new Subject<void>();
 
   product?: Product;
@@ -151,6 +153,10 @@ export class ProductDetailsComponent implements OnInit, OnDestroy {
       this.quantity = stock.availableStock;
       this.snackbar.error(`Only ${stock.availableStock} items available`);
     }
+  }
+
+  goBack() {
+    this.location.back();
   }
 }
  

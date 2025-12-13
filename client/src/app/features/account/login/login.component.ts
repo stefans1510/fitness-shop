@@ -6,7 +6,6 @@ import { MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { AccountService } from '../../../core/services/account.service';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { CartService } from '../../../core/services/cart.service';
 
 @Component({
   selector: 'app-login',
@@ -25,7 +24,6 @@ import { CartService } from '../../../core/services/cart.service';
 export class LoginComponent {
   private formBuilder = inject(FormBuilder);
   private accountService = inject(AccountService);
-  private cartService = inject(CartService);
   private router = inject(Router);
   private activatedRoute = inject(ActivatedRoute);
   returnUrl = '/shop';
@@ -45,8 +43,6 @@ export class LoginComponent {
       next: () => {
         this.accountService.getUserInfo().subscribe({
           next: () => {
-            // Update cart prices after user login
-            this.cartService.updateCartPricesForUserType();
             this.router.navigateByUrl(this.returnUrl);
           }
         });

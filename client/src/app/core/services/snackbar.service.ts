@@ -17,7 +17,8 @@ export class SnackbarService {
   success(message: string) {
     this.snackbar.open(message, 'Close', {
       duration: 5000,
-      panelClass: ['snack-success']
+      panelClass: ['snack-success'],
+      verticalPosition: 'top'
     })
   }
 }

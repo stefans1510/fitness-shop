@@ -2,12 +2,12 @@ import { Component, inject } from '@angular/core';
 import { MatButton } from '@angular/material/button';
 import { MatFormField, MatLabel, MatError } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CartService } from '../../../core/services/cart.service';
 import { CurrencyPipe, Location } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SnackbarService } from '../../../core/services/snackbar.service';
-import { MatIcon } from '@angular/material/icon';
+import { AccountService } from '../../../core/services/account.service';
 
 @Component({
   selector: 'app-order-summary',
@@ -29,6 +29,8 @@ export class OrderSummaryComponent {
   location = inject(Location);
   private fb = inject(FormBuilder);
   private snackbar = inject(SnackbarService);
+  private accountService = inject(AccountService);
+  private router = inject(Router);
 
   couponForm: FormGroup = this.fb.group({
     code: ['', [Validators.maxLength(50)]]
@@ -79,5 +81,15 @@ export class OrderSummaryComponent {
         this.snackbar.error(error.message || 'Failed to remove coupon');
       }
     });
+  }
+
+  onCheckout() {
+    if (this.accountService.currentUser()) {
+      // User is authenticated, proceed to checkout
+      this.router.navigateByUrl('/checkout');
+    } else {
+      // User is not authenticated, redirect to login with cart as return URL
+      this.router.navigate(['/account/login'], { queryParams: { returnUrl: '/cart' } });
+    }
   }
 }

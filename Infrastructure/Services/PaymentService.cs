@@ -102,7 +102,15 @@ namespace Infrastructure.Services
                     .GetByIdAsync(item.ProductId)
                     ?? throw new Exception("Problem getting product in cart");
                 
-                if (item.Price != productItem.Price)
+                // Calculate what the company discounted price would be (15% off)
+                const decimal companyDiscountPercentage = 0.15m;
+                var companyPrice = productItem.Price * (1 - companyDiscountPercentage);
+                
+                // Check if current cart price matches either regular price or company price
+                var matchesRegularPrice = Math.Abs(item.Price - productItem.Price) <= 0.01m;
+                var matchesCompanyPrice = Math.Abs(item.Price - companyPrice) <= 0.01m;
+
+                if (!matchesRegularPrice && !matchesCompanyPrice)
                 {
                     item.Price = productItem.Price;
                 }

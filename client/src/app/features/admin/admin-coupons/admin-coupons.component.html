@@ -137,14 +137,6 @@
                 </th>
                 <td mat-cell *matCellDef="let coupon" class="border-b border-gray-100 py-4">
                     <div class="flex gap-2">
-                        <!-- View Stats -->
-                        <button (click)="viewUsageStats(coupon)" 
-                                matTooltip="View Usage Statistics" 
-                                mat-icon-button 
-                                class="hover:bg-blue-50">
-                            <mat-icon class="text-blue-800">analytics</mat-icon>
-                        </button>
-
                         <!-- Edit Button -->
                         <button (click)="openEditDialog(coupon)" 
                                 matTooltip="Edit Coupon" 

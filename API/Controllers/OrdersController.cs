@@ -58,7 +58,7 @@ namespace API.Controllers
                 var orderItem = new OrderItem
                 {
                     ItemOrdered = itemOrdered,
-                    Price = productItem.Price,
+                    Price = item.Price,  // Use the cart item price (which includes company discounts)
                     Quantity = item.Quantity
                 };
 

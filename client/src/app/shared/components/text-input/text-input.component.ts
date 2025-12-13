@@ -1,5 +1,5 @@
 import { Component, Input, Self, OnInit, OnDestroy } from '@angular/core';
-import { ControlValueAccessor, FormControl, NgControl, ReactiveFormsModule, AbstractControl } from '@angular/forms';
+import { FormControl, NgControl, ReactiveFormsModule, ControlValueAccessor } from '@angular/forms';
 import { MatError, MatFormField, MatLabel } from '@angular/material/form-field';
 import { MatInput } from '@angular/material/input';
 import { ErrorStateMatcher } from '@angular/material/core';
@@ -24,7 +24,7 @@ export class ImmediateErrorStateMatcher implements ErrorStateMatcher {
   templateUrl: './text-input.component.html',
   styleUrl: './text-input.component.scss'
 })
-export class TextInputComponent implements ControlValueAccessor, OnInit, OnDestroy {
+export class TextInputComponent implements OnInit, OnDestroy, ControlValueAccessor {
   @Input() label = '';
   @Input() type = 'text';
   @Input() placeholder = '';
@@ -35,8 +35,6 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, OnDestr
   // Use custom error state matcher for immediate validation feedback
   errorMatcher = new ImmediateErrorStateMatcher();
   
-  private onChange = (value: any) => {};
-  private onTouched = () => {};
   private destroy$ = new Subject<void>();
 
   constructor(@Self() public controlDir: NgControl) {
@@ -71,34 +69,21 @@ export class TextInputComponent implements ControlValueAccessor, OnInit, OnDestr
     this.destroy$.complete();
   }
   
+  // ControlValueAccessor implementation
   writeValue(obj: any): void {
-    // Update the form control's value when set programmatically
-    this.control?.setValue(obj, { emitEvent: false });
+    // The MatInput handles the value internally via [formControl]
   }
-
+  
   registerOnChange(fn: any): void {
-    // Store the callback function to call when input changes
-    this.onChange = fn;
+    // The MatInput handles change events internally via [formControl]
   }
-
+  
   registerOnTouched(fn: any): void {
-    // Store the callback function to call when input is touched
-    this.onTouched = fn;
-  }
-
-  onInput(event: any): void {
-    // Called when user types - notify the form control and mark as dirty for immediate validation
-    this.onChange(event.target.value);
-    this.control?.markAsDirty();
-  }
-
-  onBlur(): void {
-    // Called when input loses focus - mark as touched
-    this.onTouched();
+    // The MatInput handles touched state internally via [formControl]
   }
 
   get control() {
-    return this.controlDir.control as FormControl;
+    return this.controlDir?.control as FormControl;
   }
 
   // Server error management - centralized in TextInputComponent

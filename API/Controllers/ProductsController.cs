@@ -12,19 +12,12 @@ namespace API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProductsController(IUnitOfWork unitOfWork, UserManager<AppUser> userManager, IInventoryService inventoryService) : BaseApiController
+    public class ProductsController(
+        IUnitOfWork unitOfWork, 
+        UserManager<AppUser> userManager, 
+        IInventoryService inventoryService
+    ) : BaseApiController
     {
-        private async Task<bool> IsCompanyUserAsync()
-        {
-            if (User.Identity?.IsAuthenticated != true) return false;
-            
-            var email = User.FindFirstValue(ClaimTypes.Email);
-            if (string.IsNullOrEmpty(email)) return false;
-            
-            var user = await userManager.FindByEmailAsync(email);
-            return user?.IsCompanyUser ?? false;
-        }
-
         [HttpGet]
         public async Task<ActionResult> GetProducts(
             [FromQuery]ProductSpecificationParameters specificationParameters
@@ -94,6 +87,17 @@ namespace API.Controllers
         {
             var isAvailable = await inventoryService.CheckStockAvailability(productId, requestedQuantity);
             return Ok(isAvailable);
+        }
+
+        private async Task<bool> IsCompanyUserAsync()
+        {
+            if (User.Identity?.IsAuthenticated != true) return false;
+            
+            var email = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(email)) return false;
+            
+            var user = await userManager.FindByEmailAsync(email);
+            return user?.IsCompanyUser ?? false;
         }
     }
 }

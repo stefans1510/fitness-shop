@@ -202,8 +202,12 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     const address = result?.value.address;
 
     if (address) {
+      // Get current user for name fallback since we're not collecting name in the form
+      const currentUser = this.accountService.currentUser();
+      const name = result.value.name || `${currentUser?.firstName || ''} ${currentUser?.lastName || ''}`.trim() || 'Customer';
+      
       return {
-        name: result.value.name,
+        name: name,
         line1: address.line1,
         line2: address.line2 || undefined,
         city: address.city,

@@ -3,7 +3,7 @@ import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Cart, CartItem } from '../../shared/models/cart';
 import { Product } from '../../shared/models/product';
-import { map, firstValueFrom, of, switchMap } from 'rxjs';
+import { map, firstValueFrom, of } from 'rxjs';
 import { DeliveryMethod } from '../../shared/models/deliveryMethod';
 import { Coupon } from '../../shared/models/coupon';
 import { ShopService } from './shop.service';
@@ -76,12 +76,10 @@ export class CartService {
       item = this.mapProductToCartItem(item);
     }
 
-    // Check stock availability before adding
     const productId = this.isProduct(item) ? item.id : item.productId;
     const currentCartQuantity = this.getCartItemQuantity(productId);
 
     try {
-      // Get current stock info first
       const stockInfo = await firstValueFrom(this.stockService.getAvailableStock(productId));
       
       if (stockInfo.isOutOfStock) {
@@ -93,14 +91,12 @@ export class CartService {
       const maxCanAdd = Math.max(0, stockInfo.availableStock - currentCartQuantity);
       
       if (maxCanAdd === 0) {
-        // This should rarely happen since button should be disabled, but keep as safety net
-        return;
+        return;  // Since button should be disabled, keep as safety net
       }
 
       // Add the requested quantity (should always be within limits due to UI constraints)
       const actualQuantityToAdd = Math.min(quantity, maxCanAdd);
-      
-      // Simple success message
+
       this.snackbar.success(`Added ${actualQuantityToAdd} item(s) to cart`);
 
       // Add the actual quantity we can add
@@ -208,12 +204,22 @@ export class CartService {
     }
   }
 
+  // Get current quantity of a product in the cart
+  getCartItemQuantity(productId: number): number {
+    const cart = this.cart();
+    if (!cart) return 0;
+    
+    const item = cart.items.find(x => x.productId === productId);
+    return item ? item.quantity : 0;
+  }
+
   // Update cart item prices based on current user type (company vs regular user)
-  async updateCartPricesForUserType() {
+  async updateCartPricesForUserType(): Promise<void> {
     const cart = this.cart();
     if (!cart || cart.items.length === 0) return;
 
     let hasUpdates = false;
+    let priceReductions = 0;
     const updatedItems: CartItem[] = [];
 
     // Fetch current product information with updated prices for current user
@@ -228,6 +234,10 @@ export class CartService {
           // Check if price changed
           if (Math.abs(cartItem.price - effectivePrice) > 0.01) {
             hasUpdates = true;
+            // Count if it's a price reduction (discount applied)
+            if (effectivePrice < cartItem.price) {
+              priceReductions++;
+            }
           }
 
           updatedItems.push({
@@ -248,22 +258,26 @@ export class CartService {
     // Update cart if prices changed
     if (hasUpdates) {
       const updatedCart = { ...cart, items: updatedItems };
-      this.setCart(updatedCart);
+      
+      // Wait for the cart to be properly saved before continuing
+      return new Promise((resolve) => {
+        this.http.post<Cart>(this.baseUrl + 'shoppingcart', updatedCart).subscribe({
+          next: (savedCart) => {
+            this.cart.set(savedCart);
+            
+            // Show feedback if discounts were applied
+            if (priceReductions > 0) {
+              this.snackbar.success(`Company discount applied to ${priceReductions} item${priceReductions > 1 ? 's' : ''} in your cart!`);
+            }
+            resolve();
+          },
+          error: (error) => {
+            console.error('Error saving updated cart:', error);
+            resolve(); // Still resolve to prevent hanging
+          }
+        });
+      });
     }
-  }
-
-  // Force refresh cart prices (useful for manual refresh)
-  async refreshCartPrices() {
-    await this.updateCartPricesForUserType();
-  }
-
-  // Get current quantity of a product in the cart
-  getCartItemQuantity(productId: number): number {
-    const cart = this.cart();
-    if (!cart) return 0;
-    
-    const item = cart.items.find(x => x.productId === productId);
-    return item ? item.quantity : 0;
   }
 
   // Validate entire cart stock availability

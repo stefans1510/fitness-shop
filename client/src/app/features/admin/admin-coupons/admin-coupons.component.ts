@@ -199,23 +199,6 @@ export class AdminCouponsComponent implements OnInit {
     }
   }
 
-  viewUsageStats(coupon: Coupon) {
-    this.adminService.getCouponUsageStats(coupon.code).subscribe({
-      next: stats => {
-        const remaining = stats.remainingUses !== null ? stats.remainingUses : 'Unlimited';
-        const limit = stats.usageLimit || 'No limit';
-        
-        this.snackbar.success(
-          `Usage Stats for ${coupon.code}: ${stats.totalUsage} used, ${remaining} remaining (Limit: ${limit})`
-        );
-      },
-      error: error => {
-        console.error('Error getting usage stats:', error);
-        this.snackbar.error('Error loading usage statistics');
-      }
-    });
-  }
-
   isExpired(coupon: Coupon): boolean {
     return new Date(coupon.validUntil) < new Date();
   }

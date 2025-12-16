@@ -108,8 +108,11 @@ namespace Infrastructure.Services
 
                 if (!reservations.Any())
                 {
-                    _logger.LogWarning("No uncommitted reservations found for {ReservationId}", reservationId);
-                    return false;
+                    // Nothing to commit – either there were no reservations or they were already committed.
+                    // Treat this as a no-op so that CommitReservedStock is idempotent and safe to call multiple times.
+                    _logger.LogInformation("No uncommitted reservations found for {ReservationId} - nothing to commit", reservationId);
+                    await transaction.CommitAsync();
+                    return true;
                 }
 
                 // Reduce actual stock quantities

@@ -65,16 +65,16 @@
         </button>
         @if (dropdownOpen) {
           <div class="flex flex-col gap-1 px-3 py-2 bg-gray-50 rounded shadow max-w-s w-full mx-auto text-sm">
-            <button mat-menu-item class="px-3 w-full text-left" routerLink="/account/profile">
+            <button mat-menu-item class="px-3 w-full text-left" routerLink="/account/profile" (click)="closeMenu()">
               <mat-icon>account_circle</mat-icon>
               My Profile
             </button>
-            <button mat-menu-item class="px-3 w-full text-left" routerLink="/orders">
+            <button mat-menu-item class="px-3 w-full text-left" routerLink="/orders" (click)="closeMenu()">
               <mat-icon>history</mat-icon>
               My Orders
             </button>
             <mat-divider></mat-divider>
-            <button mat-menu-item class="px-3 w-full text-left" (click)="logout()">
+            <button mat-menu-item class="px-3 w-full text-left" (click)="logout(); closeMenu()">
               <mat-icon>logout</mat-icon>
               Logout
             </button>

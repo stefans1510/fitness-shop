@@ -126,9 +126,13 @@ namespace API.Controllers
                     await couponService.UseCouponAsync(appliedCouponCode, email, order.Id.ToString(), discount);
                 }
 
-                // Note: Stock is only reserved at this point, not committed
-                // Stock commitment happens in the webhook when payment is confirmed
-                
+                // If payment is already marked as received at this point, commit stock immediately.
+                // CommitReservedStock is idempotent, so it's safe if the webhook also calls it later.
+                if (paymentStatus == OrderStatus.PaymentReceived)
+                {
+                    await inventoryService.CommitReservedStock(shoppingCart.PaymentIntentId);
+                }
+
                 return order;
             }
 
